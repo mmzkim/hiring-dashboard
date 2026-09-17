@@ -7,47 +7,24 @@
 <style>
   :root {
     color-scheme: light;
-    --surface:      #fcfcfb;
-    --surface-2:    #f2f1ed;
-    --page:         #f9f9f7;
-    --ink:          #0b0b0b;
-    --ink-2:        #52514e;
-    --ink-muted:    #898781;
-    --grid:         #e1e0d9;
-    --baseline:     #c3c2b7;
-    --border:       rgba(11,11,11,0.10);
-    --care:         #2a78d6;
-    --mzi:          #eb6834;
-  }
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) {
-      color-scheme: dark;
-      --surface:      #1a1a19;
-      --surface-2:    #232322;
-      --page:         #0d0d0d;
-      --ink:          #ffffff;
-      --ink-2:        #c3c2b7;
-      --ink-muted:    #898781;
-      --grid:         #2c2c2a;
-      --baseline:     #383835;
-      --border:       rgba(255,255,255,0.10);
-      --care:         #3987e5;
-      --mzi:          #d95926;
-    }
-  }
-  :root[data-theme="dark"] {
-    color-scheme: dark;
-    --surface:      #1a1a19;
-    --surface-2:    #232322;
-    --page:         #0d0d0d;
-    --ink:          #ffffff;
-    --ink-2:        #c3c2b7;
-    --ink-muted:    #898781;
-    --grid:         #2c2c2a;
-    --baseline:     #383835;
-    --border:       rgba(255,255,255,0.10);
-    --care:         #3987e5;
-    --mzi:          #d95926;
+    --page:         #f3f5f9;
+    --card:         #ffffff;
+    --border:       #e7e9ef;
+    --ink:          #16181d;
+    --ink-2:        #5b6472;
+    --ink-muted:    #8891a0;
+    --grid:         #edeef2;
+    --baseline:     #d6d9e0;
+    --shadow:       0 1px 2px rgba(16,24,40,.04), 0 2px 8px rgba(16,24,40,.05);
+
+    --care:         #2f6fed;   /* GC케어 */
+    --care-wash:    #e9f0ff;
+    --mzi:          #ff7a45;   /* GC메디아이 */
+    --mzi-wash:     #fff0e8;
+    --teal:         #0fb5a3;
+    --teal-wash:    #e3faf6;
+    --violet:       #7c5cfc;
+    --violet-wash:  #f0ecff;
   }
 
   * { box-sizing: border-box; }
@@ -62,12 +39,12 @@
   [hidden] { display: none !important; }
 
   .wrap {
-    max-width: 860px;
+    max-width: 980px;
     margin: 0 auto;
     padding-block: 28px 48px;
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 18px;
   }
 
   header.top {
@@ -78,8 +55,8 @@
     flex-wrap: wrap;
   }
   header.top h1 {
-    font-size: 22px;
-    font-weight: 700;
+    font-size: 23px;
+    font-weight: 800;
     margin: 0 0 4px;
     letter-spacing: -0.01em;
   }
@@ -100,89 +77,194 @@
   }
   button.iconbtn {
     border: 1px solid var(--border);
-    background: var(--surface);
+    background: var(--card);
     color: var(--ink-2);
     border-radius: 8px;
-    padding: 6px 12px;
+    padding: 7px 14px;
     font-size: 13px;
+    font-weight: 600;
     cursor: pointer;
     font-family: inherit;
   }
-  button.iconbtn:hover { color: var(--ink); border-color: var(--ink-2); }
+  button.iconbtn:hover { color: var(--ink); border-color: #c9cedb; }
   button.iconbtn:focus-visible { outline: 2px solid var(--care); outline-offset: 2px; }
 
+  /* stat tiles */
   .tiles {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 10px;
+    gap: 12px;
   }
   @media (max-width: 640px) {
     .tiles { grid-template-columns: repeat(2, 1fr); }
   }
   .tile {
-    background: var(--surface);
+    background: var(--card);
     border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 14px 16px;
+    border-radius: 14px;
+    padding: 16px 18px;
+    box-shadow: var(--shadow);
     display: flex;
     flex-direction: column;
+    gap: 8px;
+    border-top: 3px solid var(--accent, var(--care));
+  }
+  .tile.total    { --accent: var(--teal); }
+  .tile.care     { --accent: var(--care); }
+  .tile.mzi      { --accent: var(--mzi); }
+  .tile.avg      { --accent: var(--violet); }
+  .tile .label {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--ink-2);
+    display: flex;
+    align-items: center;
     gap: 6px;
   }
   .tile .dot {
     width: 8px; height: 8px; border-radius: 50%;
     display: inline-block;
-    margin-right: 6px;
-  }
-  .tile .label {
-    font-size: 12px;
-    color: var(--ink-muted);
-    display: flex;
-    align-items: center;
+    background: var(--accent);
   }
   .tile .value {
-    font-size: 26px;
-    font-weight: 700;
+    font-size: 30px;
+    font-weight: 800;
     font-variant-numeric: tabular-nums;
     letter-spacing: -0.02em;
+    color: var(--ink);
   }
   .tile .sub {
-    font-size: 11px;
+    font-size: 12px;
     color: var(--ink-muted);
+    font-weight: 500;
   }
 
-  .panel {
-    background: var(--surface);
+  /* share row: donut + legend */
+  .share-card {
+    background: var(--card);
     border: 1px solid var(--border);
     border-radius: 14px;
-    padding: 18px 18px 14px;
+    box-shadow: var(--shadow);
+    padding: 18px 20px;
+    display: flex;
+    align-items: center;
+    gap: 22px;
+    flex-wrap: wrap;
   }
+  .share-card h2 {
+    font-size: 14px;
+    font-weight: 700;
+    margin: 0 0 2px;
+  }
+  .donut-wrap { position: relative; width: 116px; height: 116px; flex: none; }
+  .donut-center {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+  }
+  .donut-center .n { font-size: 20px; font-weight: 800; font-variant-numeric: tabular-nums; }
+  .donut-center .l { font-size: 10px; color: var(--ink-muted); font-weight: 600; }
+  .share-legend { display: flex; flex-direction: column; gap: 10px; min-width: 160px; }
+  .share-row { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+  .share-row .sw { width: 10px; height: 10px; border-radius: 3px; flex: none; }
+  .share-row b { font-variant-numeric: tabular-nums; margin-left: auto; padding-left: 12px; }
+
+  .upcoming {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--ink-2);
+    padding: 11px 16px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+  }
+  .upcoming b { color: var(--ink); font-variant-numeric: tabular-nums; }
+
+  /* tabbed panel */
+  .panel-shell {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    box-shadow: var(--shadow);
+    display: flex;
+    overflow: hidden;
+  }
+  .tabnav {
+    width: 176px;
+    flex: none;
+    border-right: 1px solid var(--border);
+    padding: 14px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .tabnav button {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    text-align: left;
+    background: none;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-family: inherit;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--ink-2);
+    cursor: pointer;
+  }
+  .tabnav button .num {
+    width: 20px; height: 20px;
+    border-radius: 6px;
+    background: var(--grid);
+    color: var(--ink-muted);
+    font-size: 11px;
+    font-weight: 800;
+    display: flex; align-items: center; justify-content: center;
+    flex: none;
+  }
+  .tabnav button:hover { background: var(--page); }
+  .tabnav button.active {
+    background: var(--care-wash);
+    color: var(--care);
+  }
+  .tabnav button.active .num {
+    background: var(--care);
+    color: #fff;
+  }
+  @media (max-width: 640px) {
+    .panel-shell { flex-direction: column; }
+    .tabnav {
+      width: auto;
+      flex-direction: row;
+      border-right: none;
+      border-bottom: 1px solid var(--border);
+      overflow-x: auto;
+    }
+    .tabnav button { white-space: nowrap; }
+  }
+
+  .panel-body { flex: 1; min-width: 0; padding: 20px 22px; }
   .panel-head {
     display: flex;
     justify-content: space-between;
     align-items: baseline;
     flex-wrap: wrap;
     gap: 8px;
-    margin-bottom: 6px;
+    margin-bottom: 12px;
   }
-  .panel-head h2 {
-    font-size: 15px;
-    font-weight: 700;
-    margin: 0;
-  }
-  .legend {
-    display: flex;
-    gap: 14px;
-    font-size: 12px;
-    color: var(--ink-2);
-  }
+  .panel-head h2 { font-size: 15px; font-weight: 700; margin: 0; }
+  .legend { display: flex; gap: 16px; font-size: 12.5px; color: var(--ink-2); font-weight: 600; }
   .legend span { display: flex; align-items: center; gap: 6px; }
-  .legend i { width: 9px; height: 9px; border-radius: 2px; display: inline-block; }
+  .legend i { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
 
   .chart-scroll { overflow-x: auto; }
   svg#chart { display: block; width: 100%; height: auto; min-width: 480px; }
   .bar { cursor: pointer; }
-  .bar:hover { filter: brightness(1.08); }
-  .axis-label { fill: var(--ink-muted); font-size: 11px; font-family: inherit; }
+  .bar:hover { filter: brightness(1.06); }
+  .axis-label { fill: var(--ink-muted); font-size: 11.5px; font-family: inherit; font-weight: 600; }
   .grid-line { stroke: var(--grid); stroke-width: 1; }
   .baseline-line { stroke: var(--baseline); stroke-width: 1; }
 
@@ -190,7 +272,7 @@
     position: fixed;
     pointer-events: none;
     background: var(--ink);
-    color: var(--surface);
+    color: #fff;
     font-size: 12px;
     padding: 7px 10px;
     border-radius: 8px;
@@ -204,35 +286,36 @@
   }
   #tooltip.show { opacity: 1; }
 
-  .footnote {
-    font-size: 12px;
-    color: var(--ink-muted);
-    line-height: 1.6;
-  }
+  .footnote { font-size: 12px; color: var(--ink-muted); line-height: 1.6; margin-top: 12px; }
 
   table.datatable {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 13px;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 15px;
     font-variant-numeric: tabular-nums;
+    width: auto;
+    min-width: 100%;
   }
   table.datatable th, table.datatable td {
     text-align: right;
-    padding: 6px 8px;
-    border-bottom: 1px solid var(--grid);
+    padding: 11px 20px;
   }
-  table.datatable th:first-child, table.datatable td:first-child { text-align: left; }
-  table.datatable thead th { color: var(--ink-muted); font-weight: 600; font-size: 11px; }
-
-  .toggle-link {
-    background: none;
-    border: none;
-    color: var(--ink-2);
-    font-size: 12px;
-    text-decoration: underline;
-    cursor: pointer;
-    padding: 0;
-    font-family: inherit;
+  table.datatable th:first-child, table.datatable td:first-child { text-align: left; padding-left: 4px; }
+  table.datatable th:last-child, table.datatable td:last-child { padding-right: 4px; }
+  table.datatable thead th {
+    color: var(--ink-muted);
+    font-weight: 700;
+    font-size: 11.5px;
+    text-transform: uppercase;
+    letter-spacing: .03em;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 10px;
+  }
+  table.datatable tbody tr:nth-child(odd) { background: var(--page); }
+  table.datatable tbody td { font-weight: 700; }
+  table.datatable tbody td.month-cell { font-weight: 600; color: var(--ink-2); }
+  table.datatable .swatch {
+    display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 7px;
   }
 
   .state-card {
@@ -245,7 +328,7 @@
   .state-card .big { font-size: 28px; margin-bottom: 6px; }
   pre.sql {
     text-align: left;
-    background: var(--surface-2);
+    background: var(--page);
     border: 1px solid var(--border);
     border-radius: 8px;
     padding: 12px 14px;
@@ -254,18 +337,6 @@
     margin-top: 12px;
     color: var(--ink);
   }
-
-  .upcoming {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 13px;
-    color: var(--ink-2);
-    padding: 10px 14px;
-    background: var(--surface-2);
-    border-radius: 10px;
-  }
-  .upcoming b { color: var(--ink); font-variant-numeric: tabular-nums; }
 </style>
 </head>
 <body>
@@ -300,27 +371,47 @@ grant select on public.hire_stats to anon;</pre>
     </div>
   </div>
 
-  <div id="content" hidden style="display:flex; flex-direction:column; gap:20px;">
+  <div id="content" hidden style="display:flex; flex-direction:column; gap:18px;">
     <div class="tiles">
-      <div class="tile">
-        <span class="label">올해 누적 입사자</span>
+      <div class="tile total">
+        <span class="label"><span class="dot"></span>올해 누적 입사자</span>
         <span class="value" id="tileTotal">–</span>
         <span class="sub" id="tileTotalSub">&nbsp;</span>
       </div>
-      <div class="tile">
-        <span class="label"><span class="dot" style="background:var(--care)"></span>GC케어</span>
+      <div class="tile care">
+        <span class="label"><span class="dot"></span>GC케어</span>
         <span class="value" id="tileCare">–</span>
         <span class="sub">&nbsp;</span>
       </div>
-      <div class="tile">
-        <span class="label"><span class="dot" style="background:var(--mzi)"></span>GC메디아이</span>
+      <div class="tile mzi">
+        <span class="label"><span class="dot"></span>GC메디아이</span>
         <span class="value" id="tileMzi">–</span>
         <span class="sub">&nbsp;</span>
       </div>
-      <div class="tile">
-        <span class="label">월평균 (완료월 기준)</span>
+      <div class="tile avg">
+        <span class="label"><span class="dot"></span>월평균</span>
         <span class="value" id="tileAvg">–</span>
         <span class="sub" id="tileAvgSub">&nbsp;</span>
+      </div>
+    </div>
+
+    <div class="share-card">
+      <div class="donut-wrap">
+        <svg viewBox="0 0 120 120" width="116" height="116">
+          <circle cx="60" cy="60" r="50" fill="none" stroke="var(--grid)" stroke-width="16" />
+          <g id="donutSegs" transform="rotate(-90 60 60)"></g>
+        </svg>
+        <div class="donut-center">
+          <span class="n" id="donutTotal">–</span>
+          <span class="l">TOTAL</span>
+        </div>
+      </div>
+      <div>
+        <h2>회사별 비중</h2>
+        <div class="share-legend">
+          <div class="share-row"><span class="sw" style="background:var(--care)"></span>GC케어<b id="shareCare">–</b></div>
+          <div class="share-row"><span class="sw" style="background:var(--mzi)"></span>GC메디아이<b id="shareMzi">–</b></div>
+        </div>
       </div>
     </div>
 
@@ -328,22 +419,35 @@ grant select on public.hire_stats to anon;</pre>
       📅 예정된 입사 <b id="upcomingCount">0</b>명이 아직 반영되지 않았습니다 (미래 입사일 기준)
     </div>
 
-    <div class="panel">
-      <div class="panel-head">
-        <h2>월별 입사자 수</h2>
-        <div class="legend">
-          <span><i style="background:var(--care)"></i>GC케어</span>
-          <span><i style="background:var(--mzi)"></i>GC메디아이</span>
+    <div class="panel-shell">
+      <div class="tabnav">
+        <button type="button" class="tab-btn active" data-tab="chart"><span class="num">1</span>월별 그래프</button>
+        <button type="button" class="tab-btn" data-tab="table"><span class="num">2</span>상세 표</button>
+      </div>
+      <div class="panel-body">
+        <div id="chartTab">
+          <div class="panel-head">
+            <h2>월별 입사자 수</h2>
+            <div class="legend">
+              <span><i style="background:var(--care)"></i>GC케어</span>
+              <span><i style="background:var(--mzi)"></i>GC메디아이</span>
+            </div>
+          </div>
+          <div class="chart-scroll">
+            <svg id="chart" viewBox="0 0 600 260" preserveAspectRatio="xMinYMin meet"></svg>
+          </div>
+          <p class="footnote">작년 대비 증감률은 2025년 데이터 확보 후 추가될 예정입니다.</p>
+        </div>
+        <div id="tableTab" hidden>
+          <div class="panel-head">
+            <h2>월별 상세 표</h2>
+          </div>
+          <div style="overflow-x:auto;">
+            <table class="datatable" id="dataTable"></table>
+          </div>
+          <p class="footnote" id="tableFootnote"></p>
         </div>
       </div>
-      <div class="chart-scroll">
-        <svg id="chart" viewBox="0 0 600 260" preserveAspectRatio="xMinYMin meet"></svg>
-      </div>
-      <div style="margin-top:10px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
-        <span class="footnote">작년 대비 증감률은 2025년 데이터 확보 후 추가될 예정입니다.</span>
-        <button class="toggle-link" id="tableToggle" type="button">표로 보기</button>
-      </div>
-      <div id="tableWrap" style="margin-top:12px; overflow-x:auto;" hidden></div>
     </div>
   </div>
 </div>
@@ -357,6 +461,8 @@ grant select on public.hire_stats to anon;</pre>
 
   var CARE = "GC케어";
   var MZI = "GC메디아이";
+  var CARE_HEX = "#2f6fed";
+  var MZI_HEX = "#ff7a45";
 
   var loadingEl = document.getElementById("loadingState");
   var errorEl = document.getElementById("errorState");
@@ -471,6 +577,8 @@ grant select on public.hire_stats to anon;</pre>
       document.getElementById("tileAvgSub").textContent = "데이터 부족";
     }
 
+    drawDonut(totalCare, totalMzi, total);
+
     var upcomingWrap = document.getElementById("upcomingWrap");
     if (upcoming.length > 0) {
       upcomingWrap.hidden = false;
@@ -481,6 +589,35 @@ grant select on public.hire_stats to anon;</pre>
 
     drawChart(byMonth);
     buildTable(byMonth, upcoming.length);
+  }
+
+  function drawDonut(care, mzi, total) {
+    document.getElementById("donutTotal").textContent = total;
+    var carePct = total > 0 ? Math.round((care / total) * 100) : 0;
+    var mziPct = total > 0 ? 100 - carePct : 0;
+    document.getElementById("shareCare").textContent = care + "명 (" + carePct + "%)";
+    document.getElementById("shareMzi").textContent = mzi + "명 (" + mziPct + "%)";
+
+    var r = 50, C = 2 * Math.PI * r;
+    var careLen = total > 0 ? (care / total) * C : 0;
+    var mziLen = total > 0 ? (mzi / total) * C : 0;
+    var g = document.getElementById("donutSegs");
+    g.innerHTML = "";
+    function seg(len, offset, color) {
+      var c = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+      c.setAttribute("cx", 60); c.setAttribute("cy", 60); c.setAttribute("r", r);
+      c.setAttribute("fill", "none");
+      c.setAttribute("stroke", color);
+      c.setAttribute("stroke-width", 16);
+      c.setAttribute("stroke-dasharray", len + " " + (C - len));
+      c.setAttribute("stroke-dashoffset", -offset);
+      c.setAttribute("stroke-linecap", len > 0 && len < C ? "butt" : "round");
+      g.appendChild(c);
+    }
+    if (total > 0) {
+      seg(careLen, 0, CARE_HEX);
+      seg(mziLen, careLen, MZI_HEX);
+    }
   }
 
   function drawChart(byMonth) {
@@ -527,7 +664,7 @@ grant select on public.hire_stats to anon;</pre>
       var gx = padLeft + i * groupW;
       var centerX = gx + groupW / 2;
 
-      [["care", item.care, "var(--care)", -1], ["mzi", item.mzi, "var(--mzi)", 1]].forEach(function (spec) {
+      [["care", item.care, CARE_HEX, -1], ["mzi", item.mzi, MZI_HEX, 1]].forEach(function (spec) {
         var val = spec[1];
         var h = (val / niceMax) * chartH;
         var x = centerX + spec[3] * (barW / 2 + gap / 2) - (spec[3] > 0 ? 0 : barW);
@@ -567,24 +704,33 @@ grant select on public.hire_stats to anon;</pre>
   function hideTip() { tooltipEl.classList.remove("show"); }
 
   function buildTable(byMonth, upcomingCount) {
-    var wrap = document.getElementById("tableWrap");
-    var html = '<table class="datatable"><thead><tr><th>월</th><th>GC케어</th><th>GC메디아이</th><th>합계</th></tr></thead><tbody>';
+    var t = document.getElementById("dataTable");
+    var html = '<thead><tr><th>월</th><th>GC케어</th><th>GC메디아이</th><th>합계</th></tr></thead><tbody>';
     byMonth.forEach(function (item) {
-      html += "<tr><td>" + item.m + "월" + (item.partial ? " (진행중)" : "") + "</td><td>" + item.care + "</td><td>" + item.mzi + "</td><td>" + item.total + "</td></tr>";
+      html += "<tr>" +
+        '<td class="month-cell">' + item.m + "월" + (item.partial ? " (진행중)" : "") + "</td>" +
+        '<td><span class="swatch" style="background:' + CARE_HEX + '"></span>' + item.care + "</td>" +
+        '<td><span class="swatch" style="background:' + MZI_HEX + '"></span>' + item.mzi + "</td>" +
+        "<td>" + item.total + "</td>" +
+        "</tr>";
     });
-    html += "</tbody></table>";
-    if (upcomingCount > 0) {
-      html += '<p class="footnote" style="margin-top:8px;">※ 예정된 입사 ' + upcomingCount + '명은 위 표에 포함되지 않았습니다.</p>';
-    }
-    wrap.innerHTML = html;
+    html += "</tbody>";
+    t.innerHTML = html;
+    var fn = document.getElementById("tableFootnote");
+    fn.textContent = upcomingCount > 0 ? ("※ 예정된 입사 " + upcomingCount + "명은 위 표에 포함되지 않았습니다.") : "";
   }
 
   document.getElementById("refreshBtn").addEventListener("click", load);
   document.getElementById("retryBtn").addEventListener("click", load);
-  document.getElementById("tableToggle").addEventListener("click", function () {
-    var w = document.getElementById("tableWrap");
-    w.hidden = !w.hidden;
-    this.textContent = w.hidden ? "표로 보기" : "표 숨기기";
+
+  document.querySelectorAll(".tab-btn").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      document.querySelectorAll(".tab-btn").forEach(function (b) { b.classList.remove("active"); });
+      btn.classList.add("active");
+      var tab = btn.getAttribute("data-tab");
+      document.getElementById("chartTab").hidden = tab !== "chart";
+      document.getElementById("tableTab").hidden = tab !== "table";
+    });
   });
 
   load();
