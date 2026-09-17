@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>입사 현황 보드</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%93%8A%3C/text%3E%3C/svg%3E" />
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" />
 <style>
   :root {
     color-scheme: light;
@@ -33,7 +35,7 @@
   body {
     background: var(--page);
     color: var(--ink);
-    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-family: "Pretendard", "Noto Sans KR", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Malgun Gothic", sans-serif;
     padding-inline: 16px;
   }
   img { max-width: 100%; }
@@ -55,16 +57,49 @@
     gap: 12px;
     flex-wrap: wrap;
   }
-  header.top h1 {
-    font-size: 23px;
+  .title-block { display: flex; flex-direction: column; gap: 5px; }
+  .kicker {
+    font-size: 11px;
     font-weight: 800;
-    margin: 0 0 4px;
-    letter-spacing: -0.01em;
+    letter-spacing: .09em;
+    text-transform: uppercase;
+    color: var(--care);
   }
-  header.top p {
+  header.top h1 {
+    font-size: 25px;
+    font-weight: 800;
     margin: 0;
-    font-size: 13px;
+    letter-spacing: -0.02em;
+  }
+  .subtitle-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 2px;
+  }
+  .chip {
+    font-size: 11.5px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 999px;
+    line-height: 1.5;
+  }
+  .chip-care { background: var(--care-wash); color: var(--care); }
+  .chip-mzi { background: var(--mzi-wash); color: var(--mzi); }
+  .sync-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 600;
     color: var(--ink-2);
+  }
+  .sync-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--teal);
+    box-shadow: 0 0 0 3px var(--teal-wash);
+    flex: none;
   }
   .refresh-row {
     display: flex;
@@ -338,6 +373,9 @@
     font-variant-numeric: tabular-nums;
     width: 100%;
     table-layout: fixed;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
   }
   table.datatable th, table.datatable td {
     text-align: center;
@@ -386,9 +424,14 @@
 
 <div class="wrap">
   <header class="top">
-    <div>
+    <div class="title-block">
+      <span class="kicker">HR · Recruitment</span>
       <h1>입사 현황 보드</h1>
-      <p>GC케어 · GC메디아이 신규입사자 · 온보딩캘린더 연동</p>
+      <div class="subtitle-row">
+        <span class="chip chip-care">GC케어</span>
+        <span class="chip chip-mzi">GC메디아이</span>
+        <span class="sync-badge"><span class="sync-dot"></span>온보딩캘린더 연동</span>
+      </div>
     </div>
     <div class="refresh-row">
       <span id="updatedAt">불러오는 중…</span>
