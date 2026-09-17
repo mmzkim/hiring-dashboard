@@ -1,0 +1,594 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>입사 현황 보드</title>
+<style>
+  :root {
+    color-scheme: light;
+    --surface:      #fcfcfb;
+    --surface-2:    #f2f1ed;
+    --page:         #f9f9f7;
+    --ink:          #0b0b0b;
+    --ink-2:        #52514e;
+    --ink-muted:    #898781;
+    --grid:         #e1e0d9;
+    --baseline:     #c3c2b7;
+    --border:       rgba(11,11,11,0.10);
+    --care:         #2a78d6;
+    --mzi:          #eb6834;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --surface:      #1a1a19;
+      --surface-2:    #232322;
+      --page:         #0d0d0d;
+      --ink:          #ffffff;
+      --ink-2:        #c3c2b7;
+      --ink-muted:    #898781;
+      --grid:         #2c2c2a;
+      --baseline:     #383835;
+      --border:       rgba(255,255,255,0.10);
+      --care:         #3987e5;
+      --mzi:          #d95926;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --surface:      #1a1a19;
+    --surface-2:    #232322;
+    --page:         #0d0d0d;
+    --ink:          #ffffff;
+    --ink-2:        #c3c2b7;
+    --ink-muted:    #898781;
+    --grid:         #2c2c2a;
+    --baseline:     #383835;
+    --border:       rgba(255,255,255,0.10);
+    --care:         #3987e5;
+    --mzi:          #d95926;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    background: var(--page);
+    color: var(--ink);
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    padding-inline: 16px;
+  }
+  img { max-width: 100%; }
+  [hidden] { display: none !important; }
+
+  .wrap {
+    max-width: 860px;
+    margin: 0 auto;
+    padding-block: 28px 48px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  header.top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  header.top h1 {
+    font-size: 22px;
+    font-weight: 700;
+    margin: 0 0 4px;
+    letter-spacing: -0.01em;
+  }
+  header.top p {
+    margin: 0;
+    font-size: 13px;
+    color: var(--ink-2);
+  }
+  .refresh-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  #updatedAt {
+    font-size: 12px;
+    color: var(--ink-muted);
+    font-variant-numeric: tabular-nums;
+  }
+  button.iconbtn {
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--ink-2);
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-size: 13px;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  button.iconbtn:hover { color: var(--ink); border-color: var(--ink-2); }
+  button.iconbtn:focus-visible { outline: 2px solid var(--care); outline-offset: 2px; }
+
+  .tiles {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+  }
+  @media (max-width: 640px) {
+    .tiles { grid-template-columns: repeat(2, 1fr); }
+  }
+  .tile {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .tile .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    display: inline-block;
+    margin-right: 6px;
+  }
+  .tile .label {
+    font-size: 12px;
+    color: var(--ink-muted);
+    display: flex;
+    align-items: center;
+  }
+  .tile .value {
+    font-size: 26px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.02em;
+  }
+  .tile .sub {
+    font-size: 11px;
+    color: var(--ink-muted);
+  }
+
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 18px 18px 14px;
+  }
+  .panel-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 6px;
+  }
+  .panel-head h2 {
+    font-size: 15px;
+    font-weight: 700;
+    margin: 0;
+  }
+  .legend {
+    display: flex;
+    gap: 14px;
+    font-size: 12px;
+    color: var(--ink-2);
+  }
+  .legend span { display: flex; align-items: center; gap: 6px; }
+  .legend i { width: 9px; height: 9px; border-radius: 2px; display: inline-block; }
+
+  .chart-scroll { overflow-x: auto; }
+  svg#chart { display: block; width: 100%; height: auto; min-width: 480px; }
+  .bar { cursor: pointer; }
+  .bar:hover { filter: brightness(1.08); }
+  .axis-label { fill: var(--ink-muted); font-size: 11px; font-family: inherit; }
+  .grid-line { stroke: var(--grid); stroke-width: 1; }
+  .baseline-line { stroke: var(--baseline); stroke-width: 1; }
+
+  #tooltip {
+    position: fixed;
+    pointer-events: none;
+    background: var(--ink);
+    color: var(--surface);
+    font-size: 12px;
+    padding: 7px 10px;
+    border-radius: 8px;
+    line-height: 1.5;
+    opacity: 0;
+    transform: translate(-50%, -100%);
+    transition: opacity 0.08s ease;
+    z-index: 20;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+  #tooltip.show { opacity: 1; }
+
+  .footnote {
+    font-size: 12px;
+    color: var(--ink-muted);
+    line-height: 1.6;
+  }
+
+  table.datatable {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
+  }
+  table.datatable th, table.datatable td {
+    text-align: right;
+    padding: 6px 8px;
+    border-bottom: 1px solid var(--grid);
+  }
+  table.datatable th:first-child, table.datatable td:first-child { text-align: left; }
+  table.datatable thead th { color: var(--ink-muted); font-weight: 600; font-size: 11px; }
+
+  .toggle-link {
+    background: none;
+    border: none;
+    color: var(--ink-2);
+    font-size: 12px;
+    text-decoration: underline;
+    cursor: pointer;
+    padding: 0;
+    font-family: inherit;
+  }
+
+  .state-card {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--ink-2);
+    font-size: 13px;
+    line-height: 1.7;
+  }
+  .state-card .big { font-size: 28px; margin-bottom: 6px; }
+  pre.sql {
+    text-align: left;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 14px;
+    font-size: 12px;
+    overflow-x: auto;
+    margin-top: 12px;
+    color: var(--ink);
+  }
+
+  .upcoming {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--ink-2);
+    padding: 10px 14px;
+    background: var(--surface-2);
+    border-radius: 10px;
+  }
+  .upcoming b { color: var(--ink); font-variant-numeric: tabular-nums; }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="top">
+    <div>
+      <h1>입사 현황 보드</h1>
+      <p>GC케어 · GC메디아이 신규입사자 · 온보딩캘린더 데이터 기준</p>
+    </div>
+    <div class="refresh-row">
+      <span id="updatedAt">불러오는 중…</span>
+      <button class="iconbtn" id="refreshBtn" type="button">새로고침</button>
+    </div>
+  </header>
+
+  <div id="loadingState" class="state-card">
+    <div class="big">⏳</div>
+    데이터를 불러오는 중입니다…
+  </div>
+
+  <div id="errorState" class="state-card" hidden>
+    <div class="big">⚠️</div>
+    <div id="errorMsg">데이터를 불러오지 못했습니다.</div>
+    <pre class="sql" id="errorSql" hidden>create or replace view public.hire_stats as
+select distinct name, company, hire_date
+from public.employees;
+
+grant select on public.hire_stats to anon;</pre>
+    <div style="margin-top:14px;">
+      <button class="iconbtn" id="retryBtn" type="button">다시 시도</button>
+    </div>
+  </div>
+
+  <div id="content" hidden style="display:flex; flex-direction:column; gap:20px;">
+    <div class="tiles">
+      <div class="tile">
+        <span class="label">올해 누적 입사자</span>
+        <span class="value" id="tileTotal">–</span>
+        <span class="sub" id="tileTotalSub">&nbsp;</span>
+      </div>
+      <div class="tile">
+        <span class="label"><span class="dot" style="background:var(--care)"></span>GC케어</span>
+        <span class="value" id="tileCare">–</span>
+        <span class="sub">&nbsp;</span>
+      </div>
+      <div class="tile">
+        <span class="label"><span class="dot" style="background:var(--mzi)"></span>GC메디아이</span>
+        <span class="value" id="tileMzi">–</span>
+        <span class="sub">&nbsp;</span>
+      </div>
+      <div class="tile">
+        <span class="label">월평균 (완료월 기준)</span>
+        <span class="value" id="tileAvg">–</span>
+        <span class="sub" id="tileAvgSub">&nbsp;</span>
+      </div>
+    </div>
+
+    <div id="upcomingWrap" class="upcoming" hidden>
+      📅 예정된 입사 <b id="upcomingCount">0</b>명이 아직 반영되지 않았습니다 (미래 입사일 기준)
+    </div>
+
+    <div class="panel">
+      <div class="panel-head">
+        <h2>월별 입사자 수</h2>
+        <div class="legend">
+          <span><i style="background:var(--care)"></i>GC케어</span>
+          <span><i style="background:var(--mzi)"></i>GC메디아이</span>
+        </div>
+      </div>
+      <div class="chart-scroll">
+        <svg id="chart" viewBox="0 0 600 260" preserveAspectRatio="xMinYMin meet"></svg>
+      </div>
+      <div style="margin-top:10px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+        <span class="footnote">작년 대비 증감률은 2025년 데이터 확보 후 추가될 예정입니다.</span>
+        <button class="toggle-link" id="tableToggle" type="button">표로 보기</button>
+      </div>
+      <div id="tableWrap" style="margin-top:12px; overflow-x:auto;" hidden></div>
+    </div>
+  </div>
+</div>
+
+<div id="tooltip"></div>
+
+<script>
+(function () {
+  var SUPABASE_URL = "https://kubcwywqxvwgoxtnciyz.supabase.co";
+  var ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt1YmN3eXdxeHZ3Z294dG5jaXl6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQxNzI0MTIsImV4cCI6MjA5OTc0ODQxMn0.jk23tFy6y6Qg6lbPwcvs9E_yKJhNAry2QSa23xCKS1Q";
+
+  var CARE = "GC케어";
+  var MZI = "GC메디아이";
+
+  var loadingEl = document.getElementById("loadingState");
+  var errorEl = document.getElementById("errorState");
+  var errorMsgEl = document.getElementById("errorMsg");
+  var errorSqlEl = document.getElementById("errorSql");
+  var contentEl = document.getElementById("content");
+  var updatedAtEl = document.getElementById("updatedAt");
+  var tooltipEl = document.getElementById("tooltip");
+
+  function setState(state) {
+    loadingEl.hidden = state !== "loading";
+    errorEl.hidden = state !== "error";
+    contentEl.hidden = state !== "content";
+  }
+
+  function fmtTime(d) {
+    var hh = String(d.getHours()).padStart(2, "0");
+    var mm = String(d.getMinutes()).padStart(2, "0");
+    return d.getFullYear() + "." + String(d.getMonth() + 1).padStart(2, "0") + "." + String(d.getDate()).padStart(2, "0") +
+      " " + hh + ":" + mm + " 기준";
+  }
+
+  function load() {
+    setState("loading");
+    updatedAtEl.textContent = "불러오는 중…";
+    var url = SUPABASE_URL + "/rest/v1/hire_stats?select=name,company,hire_date&order=hire_date.asc";
+    fetch(url, {
+      headers: {
+        apikey: ANON_KEY,
+        Authorization: "Bearer " + ANON_KEY
+      }
+    })
+      .then(function (res) {
+        if (!res.ok) {
+          return res.text().then(function (t) {
+            throw new Error("HTTP " + res.status + ": " + t);
+          });
+        }
+        return res.json();
+      })
+      .then(function (rows) {
+        render(rows);
+        setState("content");
+        updatedAtEl.textContent = fmtTime(new Date());
+      })
+      .catch(function (err) {
+        console.error(err);
+        var msg = String(err && err.message || err);
+        if (msg.indexOf("42P01") !== -1 || msg.indexOf("does not exist") !== -1 || msg.indexOf("PGRST") !== -1) {
+          errorMsgEl.textContent = "hire_stats 뷰를 아직 찾을 수 없습니다. Supabase SQL Editor에서 아래 SQL을 실행했는지 확인해주세요.";
+          errorSqlEl.hidden = false;
+        } else if (msg.indexOf("401") !== -1 || msg.indexOf("403") !== -1) {
+          errorMsgEl.textContent = "접근 권한 오류입니다. anon 키에 hire_stats 조회 권한(grant select)이 부여됐는지 확인해주세요.";
+          errorSqlEl.hidden = false;
+        } else {
+          errorMsgEl.textContent = "데이터를 불러오지 못했습니다. 네트워크 상태를 확인하고 다시 시도해주세요.";
+          errorSqlEl.hidden = true;
+        }
+        setState("error");
+      });
+  }
+
+  function dedupeKey(r) { return r.name + "|" + r.company + "|" + r.hire_date; }
+
+  function render(rows) {
+    var seen = {};
+    var clean = [];
+    rows.forEach(function (r) {
+      if (!r.hire_date || !r.company) return;
+      var k = dedupeKey(r);
+      if (seen[k]) return;
+      seen[k] = true;
+      clean.push(r);
+    });
+
+    var today = new Date();
+    var todayStr = today.toISOString().slice(0, 10);
+    var year = today.getFullYear();
+    var curMonth = today.getMonth() + 1;
+
+    var thisYear = clean.filter(function (r) { return r.hire_date.slice(0, 4) === String(year); });
+    var upcoming = thisYear.filter(function (r) { return r.hire_date > todayStr; });
+    var confirmed = thisYear.filter(function (r) { return r.hire_date <= todayStr; });
+
+    var months = [];
+    for (var m = 1; m <= curMonth; m++) months.push(m);
+    var byMonth = months.map(function (m) {
+      var mm = String(m).padStart(2, "0");
+      var inMonth = confirmed.filter(function (r) { return r.hire_date.slice(5, 7) === mm; });
+      var care = inMonth.filter(function (r) { return r.company === CARE; }).length;
+      var mzi = inMonth.filter(function (r) { return r.company === MZI; }).length;
+      return { m: m, care: care, mzi: mzi, total: care + mzi, partial: m === curMonth };
+    });
+
+    var totalCare = confirmed.filter(function (r) { return r.company === CARE; }).length;
+    var totalMzi = confirmed.filter(function (r) { return r.company === MZI; }).length;
+    var total = totalCare + totalMzi;
+
+    var completeMonths = curMonth - 1;
+    var completeSum = byMonth.filter(function (x) { return !x.partial; }).reduce(function (a, x) { return a + x.total; }, 0);
+    var avg = completeMonths > 0 ? (completeSum / completeMonths) : null;
+
+    document.getElementById("tileTotal").textContent = total + "명";
+    document.getElementById("tileTotalSub").textContent = year + "년 1~" + curMonth + "월";
+    document.getElementById("tileCare").textContent = totalCare + "명";
+    document.getElementById("tileMzi").textContent = totalMzi + "명";
+    if (avg !== null) {
+      document.getElementById("tileAvg").textContent = avg.toFixed(1) + "명";
+      document.getElementById("tileAvgSub").textContent = "1~" + completeMonths + "월 평균";
+    } else {
+      document.getElementById("tileAvg").textContent = "–";
+      document.getElementById("tileAvgSub").textContent = "데이터 부족";
+    }
+
+    var upcomingWrap = document.getElementById("upcomingWrap");
+    if (upcoming.length > 0) {
+      upcomingWrap.hidden = false;
+      document.getElementById("upcomingCount").textContent = upcoming.length;
+    } else {
+      upcomingWrap.hidden = true;
+    }
+
+    drawChart(byMonth);
+    buildTable(byMonth, upcoming.length);
+  }
+
+  function drawChart(byMonth) {
+    var svg = document.getElementById("chart");
+    while (svg.firstChild) svg.removeChild(svg.firstChild);
+
+    var n = byMonth.length;
+    var groupW = 56;
+    var padLeft = 34, padRight = 12, padTop = 14, padBottom = 28;
+    var chartW = Math.max(n * groupW, 300);
+    var chartH = 200;
+    var W = chartW + padLeft + padRight;
+    var H = chartH + padTop + padBottom;
+    svg.setAttribute("viewBox", "0 0 " + W + " " + H);
+
+    var maxVal = Math.max(1, Math.max.apply(null, byMonth.map(function (x) { return Math.max(x.care, x.mzi); })));
+    var niceMax = Math.ceil(maxVal / 5) * 5 || 5;
+    var ySteps = 4;
+
+    function ns(tag) { return document.createElementNS("http://www.w3.org/2000/svg", tag); }
+
+    for (var s = 0; s <= ySteps; s++) {
+      var val = Math.round((niceMax / ySteps) * s);
+      var y = padTop + chartH - (val / niceMax) * chartH;
+      var line = ns("line");
+      line.setAttribute("x1", padLeft);
+      line.setAttribute("x2", padLeft + chartW);
+      line.setAttribute("y1", y);
+      line.setAttribute("y2", y);
+      line.setAttribute("class", s === 0 ? "baseline-line" : "grid-line");
+      svg.appendChild(line);
+
+      var label = ns("text");
+      label.setAttribute("x", padLeft - 8);
+      label.setAttribute("y", y + 3);
+      label.setAttribute("text-anchor", "end");
+      label.setAttribute("class", "axis-label");
+      label.textContent = val;
+      svg.appendChild(label);
+    }
+
+    var barW = 16, gap = 2;
+    byMonth.forEach(function (item, i) {
+      var gx = padLeft + i * groupW;
+      var centerX = gx + groupW / 2;
+
+      [["care", item.care, "var(--care)", -1], ["mzi", item.mzi, "var(--mzi)", 1]].forEach(function (spec) {
+        var val = spec[1];
+        var h = (val / niceMax) * chartH;
+        var x = centerX + spec[3] * (barW / 2 + gap / 2) - (spec[3] > 0 ? 0 : barW);
+        var y = padTop + chartH - h;
+        var rect = ns("rect");
+        rect.setAttribute("x", x);
+        rect.setAttribute("y", y);
+        rect.setAttribute("width", barW);
+        rect.setAttribute("height", Math.max(h, val > 0 ? 2 : 0));
+        rect.setAttribute("rx", 4);
+        rect.setAttribute("fill", spec[2]);
+        rect.setAttribute("opacity", item.partial ? 0.55 : 1);
+        rect.setAttribute("class", "bar");
+        rect.addEventListener("mousemove", function (e) { showTip(e, item, spec[0]); });
+        rect.addEventListener("mouseleave", hideTip);
+        svg.appendChild(rect);
+      });
+
+      var mlabel = ns("text");
+      mlabel.setAttribute("x", centerX);
+      mlabel.setAttribute("y", padTop + chartH + 18);
+      mlabel.setAttribute("text-anchor", "middle");
+      mlabel.setAttribute("class", "axis-label");
+      mlabel.textContent = item.m + "월" + (item.partial ? " (진행중)" : "");
+      svg.appendChild(mlabel);
+    });
+  }
+
+  function showTip(evt, item, which) {
+    var name = which === "care" ? "GC케어" : "GC메디아이";
+    var val = which === "care" ? item.care : item.mzi;
+    tooltipEl.innerHTML = item.m + "월 · " + name + " <b>" + val + "명</b>" + (item.partial ? "<br><span style='opacity:.7'>진행 중인 달</span>" : "");
+    tooltipEl.style.left = evt.clientX + "px";
+    tooltipEl.style.top = (evt.clientY - 10) + "px";
+    tooltipEl.classList.add("show");
+  }
+  function hideTip() { tooltipEl.classList.remove("show"); }
+
+  function buildTable(byMonth, upcomingCount) {
+    var wrap = document.getElementById("tableWrap");
+    var html = '<table class="datatable"><thead><tr><th>월</th><th>GC케어</th><th>GC메디아이</th><th>합계</th></tr></thead><tbody>';
+    byMonth.forEach(function (item) {
+      html += "<tr><td>" + item.m + "월" + (item.partial ? " (진행중)" : "") + "</td><td>" + item.care + "</td><td>" + item.mzi + "</td><td>" + item.total + "</td></tr>";
+    });
+    html += "</tbody></table>";
+    if (upcomingCount > 0) {
+      html += '<p class="footnote" style="margin-top:8px;">※ 예정된 입사 ' + upcomingCount + '명은 위 표에 포함되지 않았습니다.</p>';
+    }
+    wrap.innerHTML = html;
+  }
+
+  document.getElementById("refreshBtn").addEventListener("click", load);
+  document.getElementById("retryBtn").addEventListener("click", load);
+  document.getElementById("tableToggle").addEventListener("click", function () {
+    var w = document.getElementById("tableWrap");
+    w.hidden = !w.hidden;
+    this.textContent = w.hidden ? "표로 보기" : "표 숨기기";
+  });
+
+  load();
+})();
+</script>
+</body>
+</html>
