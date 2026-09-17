@@ -4,6 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>입사 현황 보드</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%93%8A%3C/text%3E%3C/svg%3E" />
 <style>
   :root {
     color-scheme: light;
@@ -138,6 +139,46 @@
     color: var(--ink-muted);
     font-weight: 500;
   }
+  .tile.avg .avg-body {
+    display: flex;
+    align-items: stretch;
+    gap: 12px;
+  }
+  .tile.avg .avg-total {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    padding-right: 12px;
+    border-right: 1px solid var(--border);
+    justify-content: center;
+  }
+  .tile.avg .avg-total .value { font-size: 26px; }
+  .tile.avg .avg-companies {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 7px;
+    flex: 1;
+    min-width: 0;
+  }
+  .tile.avg .avg-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--ink-2);
+    white-space: nowrap;
+  }
+  .tile.avg .avg-row .v {
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
+    font-size: 14px;
+    font-weight: 800;
+  }
+  .tile.avg .avg-row.care .v { color: var(--care); }
+  .tile.avg .avg-row.mzi .v { color: var(--mzi); }
 
   /* share row: donut + legend */
   .share-card {
@@ -178,6 +219,7 @@
     background: var(--card);
     border: 1px solid var(--border);
     border-radius: 12px;
+    cursor: help;
   }
   .upcoming b { color: var(--ink); font-variant-numeric: tabular-nums; }
 
@@ -265,6 +307,7 @@
   .bar { cursor: pointer; }
   .bar:hover { filter: brightness(1.06); }
   .axis-label { fill: var(--ink-muted); font-size: 11.5px; font-family: inherit; font-weight: 600; }
+  .bar-label { fill: var(--ink-2); font-size: 11px; font-family: inherit; font-weight: 700; }
   .grid-line { stroke: var(--grid); stroke-width: 1; }
   .baseline-line { stroke: var(--baseline); stroke-width: 1; }
 
@@ -291,31 +334,31 @@
   table.datatable {
     border-collapse: separate;
     border-spacing: 0;
-    font-size: 15px;
+    font-size: 18px;
     font-variant-numeric: tabular-nums;
-    width: auto;
-    min-width: 100%;
+    width: 100%;
+    table-layout: fixed;
   }
   table.datatable th, table.datatable td {
-    text-align: right;
-    padding: 11px 20px;
+    text-align: center;
+    padding: 15px 12px;
+    border-right: 1px solid var(--border);
   }
-  table.datatable th:first-child, table.datatable td:first-child { text-align: left; padding-left: 4px; }
-  table.datatable th:last-child, table.datatable td:last-child { padding-right: 4px; }
+  table.datatable th:last-child, table.datatable td:last-child { border-right: none; }
   table.datatable thead th {
     color: var(--ink-muted);
     font-weight: 700;
-    font-size: 11.5px;
+    font-size: 12.5px;
     text-transform: uppercase;
     letter-spacing: .03em;
     border-bottom: 1px solid var(--border);
-    padding-bottom: 10px;
+    padding-bottom: 12px;
   }
   table.datatable tbody tr:nth-child(odd) { background: var(--page); }
   table.datatable tbody td { font-weight: 700; }
   table.datatable tbody td.month-cell { font-weight: 600; color: var(--ink-2); }
   table.datatable .swatch {
-    display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 7px;
+    display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 8px;
   }
 
   .state-card {
@@ -389,9 +432,17 @@ grant select on public.hire_stats to anon;</pre>
         <span class="sub">&nbsp;</span>
       </div>
       <div class="tile avg">
-        <span class="label"><span class="dot"></span>월평균</span>
-        <span class="value" id="tileAvg">–</span>
-        <span class="sub" id="tileAvgSub">&nbsp;</span>
+        <span class="label"><span class="dot"></span>월평균 입사자</span>
+        <div class="avg-body">
+          <div class="avg-total">
+            <span class="value" id="tileAvg">–</span>
+            <span class="sub" id="tileAvgSub">&nbsp;</span>
+          </div>
+          <div class="avg-companies">
+            <div class="avg-row care"><span class="k">케어</span><span class="v" id="tileAvgCare">–</span></div>
+            <div class="avg-row mzi"><span class="k">메디아이</span><span class="v" id="tileAvgMzi">–</span></div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -471,6 +522,8 @@ grant select on public.hire_stats to anon;</pre>
   var contentEl = document.getElementById("content");
   var updatedAtEl = document.getElementById("updatedAt");
   var tooltipEl = document.getElementById("tooltip");
+  var upcomingWrapEl = document.getElementById("upcomingWrap");
+  var upcomingList = [];
 
   function setState(state) {
     loadingEl.hidden = state !== "loading";
@@ -488,7 +541,7 @@ grant select on public.hire_stats to anon;</pre>
   function load() {
     setState("loading");
     updatedAtEl.textContent = "불러오는 중…";
-    var url = SUPABASE_URL + "/rest/v1/hire_stats?select=name,company,hire_date&order=hire_date.asc";
+    var url = SUPABASE_URL + "/rest/v1/hire_stats?select=name,company,hire_date,department&order=hire_date.asc";
     fetch(url, {
       headers: {
         apikey: ANON_KEY,
@@ -562,8 +615,11 @@ grant select on public.hire_stats to anon;</pre>
     var total = totalCare + totalMzi;
 
     var completeMonths = curMonth - 1;
-    var completeSum = byMonth.filter(function (x) { return !x.partial; }).reduce(function (a, x) { return a + x.total; }, 0);
+    var completeList = byMonth.filter(function (x) { return !x.partial; });
+    var completeSum = completeList.reduce(function (a, x) { return a + x.total; }, 0);
     var avg = completeMonths > 0 ? (completeSum / completeMonths) : null;
+    var avgCare = completeMonths > 0 ? (completeList.reduce(function (a, x) { return a + x.care; }, 0) / completeMonths) : null;
+    var avgMzi = completeMonths > 0 ? (completeList.reduce(function (a, x) { return a + x.mzi; }, 0) / completeMonths) : null;
 
     document.getElementById("tileTotal").textContent = total + "명";
     document.getElementById("tileTotalSub").textContent = year + "년 1~" + curMonth + "월";
@@ -572,19 +628,23 @@ grant select on public.hire_stats to anon;</pre>
     if (avg !== null) {
       document.getElementById("tileAvg").textContent = avg.toFixed(1) + "명";
       document.getElementById("tileAvgSub").textContent = "1~" + completeMonths + "월 평균";
+      document.getElementById("tileAvgCare").textContent = avgCare.toFixed(1) + "명";
+      document.getElementById("tileAvgMzi").textContent = avgMzi.toFixed(1) + "명";
     } else {
       document.getElementById("tileAvg").textContent = "–";
       document.getElementById("tileAvgSub").textContent = "데이터 부족";
+      document.getElementById("tileAvgCare").textContent = "–";
+      document.getElementById("tileAvgMzi").textContent = "–";
     }
 
     drawDonut(totalCare, totalMzi, total);
 
-    var upcomingWrap = document.getElementById("upcomingWrap");
+    upcomingList = upcoming;
     if (upcoming.length > 0) {
-      upcomingWrap.hidden = false;
+      upcomingWrapEl.hidden = false;
       document.getElementById("upcomingCount").textContent = upcoming.length;
     } else {
-      upcomingWrap.hidden = true;
+      upcomingWrapEl.hidden = true;
     }
 
     drawChart(byMonth);
@@ -659,15 +719,15 @@ grant select on public.hire_stats to anon;</pre>
       svg.appendChild(label);
     }
 
-    var barW = 16, gap = 2;
+    var barW = 18;
     byMonth.forEach(function (item, i) {
       var gx = padLeft + i * groupW;
       var centerX = gx + groupW / 2;
 
-      [["care", item.care, CARE_HEX, -1], ["mzi", item.mzi, MZI_HEX, 1]].forEach(function (spec) {
+      [["care", item.care, CARE_HEX, 0], ["mzi", item.mzi, MZI_HEX, 1]].forEach(function (spec) {
         var val = spec[1];
         var h = (val / niceMax) * chartH;
-        var x = centerX + spec[3] * (barW / 2 + gap / 2) - (spec[3] > 0 ? 0 : barW);
+        var x = centerX - barW + spec[3] * barW;
         var y = padTop + chartH - h;
         var rect = ns("rect");
         rect.setAttribute("x", x);
@@ -681,6 +741,16 @@ grant select on public.hire_stats to anon;</pre>
         rect.addEventListener("mousemove", function (e) { showTip(e, item, spec[0]); });
         rect.addEventListener("mouseleave", hideTip);
         svg.appendChild(rect);
+
+        if (val > 0) {
+          var lbl = ns("text");
+          lbl.setAttribute("x", x + barW / 2);
+          lbl.setAttribute("y", y - 5);
+          lbl.setAttribute("text-anchor", "middle");
+          lbl.setAttribute("class", "bar-label");
+          lbl.textContent = val;
+          svg.appendChild(lbl);
+        }
       });
 
       var mlabel = ns("text");
@@ -703,6 +773,17 @@ grant select on public.hire_stats to anon;</pre>
   }
   function hideTip() { tooltipEl.classList.remove("show"); }
 
+  function showUpcomingTip(evt) {
+    if (!upcomingList.length) return;
+    var html = upcomingList.map(function (r) {
+      return r.name + " · " + (r.department || "부서 미상") + " · " + r.hire_date;
+    }).join("<br>");
+    tooltipEl.innerHTML = html;
+    tooltipEl.style.left = evt.clientX + "px";
+    tooltipEl.style.top = (evt.clientY - 10) + "px";
+    tooltipEl.classList.add("show");
+  }
+
   function buildTable(byMonth, upcomingCount) {
     var t = document.getElementById("dataTable");
     var html = '<thead><tr><th>월</th><th>GC케어</th><th>GC메디아이</th><th>합계</th></tr></thead><tbody>';
@@ -722,6 +803,8 @@ grant select on public.hire_stats to anon;</pre>
 
   document.getElementById("refreshBtn").addEventListener("click", load);
   document.getElementById("retryBtn").addEventListener("click", load);
+  upcomingWrapEl.addEventListener("mousemove", showUpcomingTip);
+  upcomingWrapEl.addEventListener("mouseleave", hideTip);
 
   document.querySelectorAll(".tab-btn").forEach(function (btn) {
     btn.addEventListener("click", function () {
