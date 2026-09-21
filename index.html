@@ -447,6 +447,14 @@
   table.datatable .swatch {
     display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 8px;
   }
+  table.datatable .count-main { display: flex; align-items: center; justify-content: center; }
+  table.datatable .type-break {
+    font-size: 11.5px;
+    font-weight: 500;
+    color: var(--ink-muted);
+    margin-top: 4px;
+    font-variant-numeric: tabular-nums;
+  }
 
   .state-card {
     text-align: center;
@@ -1226,8 +1234,10 @@ grant select on public.hire_stats to anon;</pre>
     byMonth.forEach(function (item) {
       html += "<tr>" +
         '<td class="month-cell">' + item.m + "월" + (item.partial ? " (진행중)" : "") + "</td>" +
-        '<td><span class="swatch" style="background:' + CARE_HEX + '"></span>' + item.care + "</td>" +
-        '<td><span class="swatch" style="background:' + MZI_HEX + '"></span>' + item.mzi + "</td>" +
+        '<td><div class="count-main"><span class="swatch" style="background:' + CARE_HEX + '"></span>' + item.care + '</div>' +
+        '<div class="type-break">정규직 ' + item.careType.regular + ' · 계약직 ' + item.careType.contract + '</div></td>' +
+        '<td><div class="count-main"><span class="swatch" style="background:' + MZI_HEX + '"></span>' + item.mzi + '</div>' +
+        '<div class="type-break">정규직 ' + item.mziType.regular + ' · 계약직 ' + item.mziType.contract + '</div></td>' +
         "<td>" + item.total + "</td>" +
         "</tr>";
     });
