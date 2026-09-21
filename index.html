@@ -521,7 +521,16 @@
     gap: 8px;
   }
   .pb-popup-title { font-size: 12px; font-weight: 600; color: var(--pb-ink-muted); }
-  .pb-popup-row { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--pb-ink); }
+  .pb-popup-row {
+    display: grid;
+    grid-template-columns: 70px minmax(50px, 1fr) auto;
+    align-items: center;
+    column-gap: 8px;
+    font-size: 13px;
+    color: var(--pb-ink);
+  }
+  .pb-popup-row .pb-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .pb-popup-row .pb-note { white-space: nowrap; font-size: 12px; text-align: right; }
 
   .pb-filters { display: flex; gap: 8px; }
   .pb-filter-chip {
@@ -556,7 +565,7 @@
   .pb-group-chevron { font-size: 12px; color: var(--pb-ink-muted); transition: transform .15s; }
   .pb-group-body { padding: 4px 20px 16px 20px; display: flex; flex-direction: column; gap: 8px; border-top: 1px solid var(--pb-border); }
 
-  .pb-co-badge { display: inline-block; padding: 2px 9px; border-radius: 999px; font-size: 11px; font-weight: 600; }
+  .pb-co-badge { display: inline-block; padding: 2px 9px; border-radius: 999px; font-size: 11px; font-weight: 600; white-space: nowrap; text-align: center; }
   .pb-emp-badge { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 600; background: #f2efe9; color: var(--pb-ink-2); }
   .pb-emp-badge.contract { background: #faf0de; color: #b8763a; }
 
@@ -797,50 +806,36 @@ grant select on public.hire_stats to anon;</pre>
       <button type="button" class="pb-filter-chip" data-company="GC메디아이" style="background:var(--mzi-wash); color:var(--mzi);">GC메디아이</button>
     </div>
 
-    <div class="pb-panel">
-      <div class="pb-panel-head">
-        <div class="pb-legend">
-          <span class="pb-legend-item"><span class="pb-st-done">✓</span>완료</span>
-          <span class="pb-legend-item"><span class="pb-st-soon"></span>임박 (D-7 이내)</span>
-          <span class="pb-legend-item"><span class="pb-st-wait"></span>예정</span>
-          <span class="pb-legend-item"><span style="width:14px;height:8px;border-radius:999px;background:var(--pb-accent);display:inline-block;"></span>경과 기간</span>
-        </div>
-        <div class="pb-subtabs">
-          <button type="button" class="pb-subtab active" data-subtab="timeline">타임라인</button>
-          <button type="button" class="pb-subtab" data-subtab="table">표</button>
-        </div>
-      </div>
-
-      <div id="pbTimelineView">
-        <div style="display:flex; padding:14px 20px 0 20px;">
-          <div style="width:220px; flex-shrink:0;"></div>
-          <div class="pb-axis-months" id="pbTodayRow" style="height:14px;"></div>
-        </div>
-        <div style="display:flex; padding:2px 20px 10px 20px; border-bottom:1px solid var(--pb-border);">
-          <div style="width:220px; flex-shrink:0;"></div>
-          <div class="pb-axis-months" id="pbMonthAxis"></div>
-        </div>
-        <div id="pbRows"></div>
-      </div>
-
-      <div id="pbTableView" hidden style="overflow-x:auto;">
-        <table class="pb-tbl">
-          <thead>
-            <tr>
-              <th>이름</th><th>회사</th><th>부서</th><th>구분</th><th>입사일</th><th>중간평가 예정일</th><th>최종평가 예정일</th><th>수습종료일</th>
-            </tr>
-          </thead>
-          <tbody id="pbTableBody"></tbody>
-        </table>
-      </div>
-    </div>
-
     <div class="pb-panel" id="pbUpcomingPanel" hidden>
       <div class="pb-group-head" id="pbUpcomingToggle">
         <div class="pb-group-title">입사예정 인원 · <span class="n" id="pbUpcomingCount">0</span>명</div>
         <span class="pb-group-chevron" id="pbUpcomingChevron">▾</span>
       </div>
       <div class="pb-group-body" id="pbUpcomingBody" hidden></div>
+    </div>
+
+    <div class="pb-panel" id="pbMidPanel" hidden>
+      <div class="pb-group-head" id="pbMidToggle">
+        <div class="pb-group-title">중간평가 앞둔 인원 · <span class="n" id="pbMidCount">0</span>명</div>
+        <span class="pb-group-chevron" id="pbMidChevron">▴</span>
+      </div>
+      <div class="pb-group-body" id="pbMidBody"></div>
+    </div>
+
+    <div class="pb-panel" id="pbFinalPanel" hidden>
+      <div class="pb-group-head" id="pbFinalToggle">
+        <div class="pb-group-title">최종평가 앞둔 인원 · <span class="n" id="pbFinalCount">0</span>명</div>
+        <span class="pb-group-chevron" id="pbFinalChevron">▴</span>
+      </div>
+      <div class="pb-group-body" id="pbFinalBody"></div>
+    </div>
+
+    <div class="pb-panel" id="pbExpiringPanel" hidden>
+      <div class="pb-group-head" id="pbExpiringToggle">
+        <div class="pb-group-title">종료 앞둔 인원 · <span class="n" id="pbExpiringCount">0</span>명</div>
+        <span class="pb-group-chevron" id="pbExpiringChevron">▴</span>
+      </div>
+      <div class="pb-group-body" id="pbExpiringBody"></div>
     </div>
 
     <div class="pb-panel" id="pbCompletedPanel" hidden>
@@ -851,7 +846,7 @@ grant select on public.hire_stats to anon;</pre>
       <div class="pb-group-body" id="pbCompletedBody" hidden></div>
     </div>
 
-    <div class="footnote">중간평가=입사일+40일, 최종평가=입사일+70일, 수습종료=입사일+90일 기준으로 자동 계산됩니다. 타임라인·표에는 현재 수습 진행중인 인원만 표시되며, 입사예정·수습종료 인원은 위 목록에서 펼쳐볼 수 있습니다.</div>
+    <div class="footnote">중간평가=입사일+40일, 최종평가=입사일+70일, 수습종료=입사일+90일 기준으로 자동 계산됩니다. 진행중 인원은 다음 일정(중간평가/최종평가/종료) 기준으로 나눠서 표시되며, 입사예정·수습종료 인원은 위/아래 목록에서 펼쳐볼 수 있습니다.</div>
   </div>
 </div>
 
@@ -1259,7 +1254,6 @@ grant select on public.hire_stats to anon;</pre>
   // ── 수습현황 보드 ──────────────────────────────────────────────────
   var DAY_MS = 24 * 60 * 60 * 1000;
   var pbCompanyFilter = "all";
-  var pbSubtab = "timeline";
   var pbOpenTile = null;
   var pbLastRows = [];
 
@@ -1294,15 +1288,6 @@ grant select on public.hire_stats to anon;</pre>
     });
   });
 
-  document.querySelectorAll(".pb-subtab").forEach(function (btn) {
-    btn.addEventListener("click", function () {
-      pbSubtab = btn.getAttribute("data-subtab");
-      document.querySelectorAll(".pb-subtab").forEach(function (b) { b.classList.toggle("active", b === btn); });
-      document.getElementById("pbTimelineView").hidden = pbSubtab !== "timeline";
-      document.getElementById("pbTableView").hidden = pbSubtab !== "table";
-    });
-  });
-
   [["pbTileInprogress", "inprogress", "pbInprogressPopup"], ["pbTilePending", "pending", "pbPendingPopup"],
    ["pbTileDone", "done", "pbDonePopup"], ["pbTileExpire", "expire", "pbExpirePopup"]].forEach(function (spec) {
     var trigger = document.getElementById(spec[0]);
@@ -1324,7 +1309,7 @@ grant select on public.hire_stats to anon;</pre>
 
   document.getElementById("pbRefreshBtn").addEventListener("click", load);
 
-  ["pbUpcoming", "pbCompleted"].forEach(function (prefix) {
+  ["pbUpcoming", "pbMid", "pbFinal", "pbExpiring", "pbCompleted"].forEach(function (prefix) {
     var head = document.getElementById(prefix + "Toggle");
     if (!head) return;
     head.addEventListener("click", function () {
@@ -1337,24 +1322,44 @@ grant select on public.hire_stats to anon;</pre>
   });
 
   function popupRow(r, note, noteColor) {
-    var badgeClass = r.company === CARE ? "care-wash" : "mzi-wash";
     var color = r.company === CARE ? CARE_HEX : MZI_HEX;
     var wash = r.company === CARE ? "var(--care-wash)" : "var(--mzi-wash)";
     return '<div class="pb-popup-row"><span class="pb-co-badge" style="background:' + wash + ';color:' + color + ';">' +
-      (r.company === CARE ? "케어" : "메디아이") + "</span>" + r.name +
-      '<span style="color:' + (noteColor || "var(--pb-ink-muted)") + ';font-size:12px;">' + note + "</span></div>";
+      (r.company === CARE ? "케어" : "메디아이") + '</span>' +
+      '<span class="pb-name">' + r.name + '</span>' +
+      '<span class="pb-note" style="color:' + (noteColor || "var(--pb-ink-muted)") + ';">' + note + '</span></div>';
   }
 
-  function renderPbGroup(prefix, list, noteFn, noteColorFn) {
+  function renderPbGroup(prefix, list, noteFn, noteColorFn, splitByCompany) {
     var panelEl = document.getElementById(prefix + "Panel");
     var countEl = document.getElementById(prefix + "Count");
     var bodyEl = document.getElementById(prefix + "Body");
     if (!panelEl) return;
     panelEl.hidden = list.length === 0;
     countEl.textContent = list.length;
-    bodyEl.innerHTML = list.map(function (r) {
-      return popupRow(r, noteFn(r), noteColorFn ? noteColorFn(r) : null);
-    }).join("") || '<div style="color:var(--pb-ink-muted);font-size:13px;">해당 인원 없음</div>';
+
+    function rowsOf(arr) {
+      return arr.map(function (r) {
+        return popupRow(r, noteFn(r), noteColorFn ? noteColorFn(r) : null);
+      }).join("") || '<div style="color:var(--pb-ink-muted);font-size:13px;">해당 인원 없음</div>';
+    }
+
+    if (!splitByCompany) {
+      bodyEl.innerHTML = rowsOf(list);
+      return;
+    }
+
+    var careList = list.filter(function (r) { return r.company === CARE; });
+    var mziList = list.filter(function (r) { return r.company === MZI; });
+    function col(title, arr) {
+      return '<div style="flex:1; min-width:180px;">' +
+        '<div style="font-size:12px; font-weight:600; color:var(--pb-ink-2); margin-bottom:8px;">' + title + ' · ' + arr.length + '명</div>' +
+        '<div style="display:flex; flex-direction:column; gap:8px;">' + rowsOf(arr) + '</div>' +
+      '</div>';
+    }
+    bodyEl.innerHTML = '<div style="display:flex; gap:28px; flex-wrap:wrap;">' +
+      col("GC케어", careList) + col("GC메디아이", mziList) +
+    '</div>';
   }
 
   function renderProbation(rows) {
@@ -1386,7 +1391,7 @@ grant select on public.hire_stats to anon;</pre>
       .sort(function (a, b) { return a.hire - b.hire; });
 
     renderPbGroup("pbUpcoming", upcoming, function (r) { return "입사예정 " + fmtMD(r.hire); });
-    renderPbGroup("pbCompleted", completed, function (r) { return "종료 " + fmtMD(r.end); }, function () { return "var(--pb-ink-muted)"; });
+    renderPbGroup("pbCompleted", completed, function (r) { return "종료 " + fmtMD(r.end); }, function () { return "var(--pb-ink-muted)"; }, true);
 
     // ── 상단 타일 (진행중 인원 기준) ──
     document.getElementById("pbInprogressValue").innerHTML = filtered.length + '<span class="u">명</span>';
@@ -1426,98 +1431,21 @@ grant select on public.hire_stats to anon;</pre>
       return popupRow(r, "종료 " + fmtMD(r.end), pbStatus(r.end, today) === "soon" ? "var(--pb-soon)" : "var(--pb-ink-muted)");
     }).join("") || '<div style="color:var(--pb-ink-muted);font-size:13px;">해당 인원 없음</div>';
 
-    // ── 타임라인 / 표 ──
-    if (filtered.length === 0) {
-      document.getElementById("pbRows").innerHTML = '<div class="state-card">현재 수습이 진행 중인 인원이 없습니다.</div>';
-      document.getElementById("pbMonthAxis").innerHTML = "";
-      document.getElementById("pbTodayRow").innerHTML = "";
-      document.getElementById("pbTableBody").innerHTML = "";
-      return;
+    // ── 진행중 인원을 다음 일정(중간평가 / 최종평가 / 종료) 기준으로 3분할 ──
+    var midPending = filtered.filter(function (r) { return today < r.mid; })
+      .sort(function (a, b) { return a.mid - b.mid; });
+    var finalPending = filtered.filter(function (r) { return today >= r.mid && today < r.final; })
+      .sort(function (a, b) { return a.final - b.final; });
+    var expiringSoon = filtered.filter(function (r) { return today >= r.final; })
+      .sort(function (a, b) { return a.end - b.end; });
+
+    function noteColorFor(dateKey) {
+      return function (r) { return pbStatus(r[dateKey], today) === "soon" ? "var(--pb-soon)" : "var(--pb-ink-muted)"; };
     }
 
-    var rangeStart = filtered[0].hire;
-    var rangeEnd = filtered.reduce(function (max, r) { return r.end > max ? r.end : max; }, filtered[0].end);
-    rangeEnd = addDays(rangeEnd, 5);
-    var rangeSpan = rangeEnd - rangeStart;
-    function pct(d) { return ((d - rangeStart) / rangeSpan) * 100; }
-
-    var monthAxisEl = document.getElementById("pbMonthAxis");
-    var monthsHtml = "";
-    var cursor = new Date(rangeStart.getFullYear(), rangeStart.getMonth(), 1);
-    while (cursor <= rangeEnd) {
-      var p = pct(cursor);
-      if (p >= -2 && p <= 102) {
-        monthsHtml += '<span style="left:' + Math.max(0, p) + '%;">' + (cursor.getMonth() + 1) + "월</span>";
-      }
-      cursor = new Date(cursor.getFullYear(), cursor.getMonth() + 1, 1);
-    }
-    monthAxisEl.innerHTML = monthsHtml;
-
-    var todayRowEl = document.getElementById("pbTodayRow");
-    if (today >= rangeStart && today <= rangeEnd) {
-      todayRowEl.innerHTML = '<span class="pb-today-label" style="left:' + pct(today) + '%;">▼ 오늘 ' + fmtMD(today) + "</span>";
-    } else {
-      todayRowEl.innerHTML = "";
-    }
-
-    var rowsHtml = "";
-    filtered.forEach(function (r) {
-      var startPct = pct(r.hire);
-      var elapsedEnd = today < r.end ? today : r.end;
-      var elapsedPct = pct(elapsedEnd) - startPct;
-      var totalPct = pct(r.end) - startPct;
-      var gridlines = "";
-      for (var g = 0; g <= 100; g += 10) gridlines += '<div class="pb-gline" style="left:' + g + '%;"></div>';
-
-      function marker(d, label) {
-        var st = pbStatus(d, today);
-        var cls = st === "done" ? "pb-m-done" : (st === "soon" ? "pb-m-soon" : "pb-m-wait");
-        var color = st === "done" ? "var(--pb-done)" : (st === "soon" ? "var(--pb-soon)" : "var(--pb-ink-muted)");
-        var inner = st === "done" ? '<span style="color:#fff;font-size:10px;font-weight:700;">✓</span>' : "";
-        return '<div class="' + cls + '" style="left:' + pct(d) + '%;">' + inner + "</div>" +
-          '<div class="pb-m-label" style="left:' + pct(d) + '%; transform:translateX(-50%); color:' + color + ';">' + label + " " + fmtMD(d) + "</div>";
-      }
-
-      var empClass = r.employmentType === "계약직" ? "contract" : "";
-      var coWash = r.company === CARE ? "var(--care-wash)" : "var(--mzi-wash)";
-      var coColor = r.company === CARE ? CARE_HEX : MZI_HEX;
-
-      rowsHtml += '<div class="pb-row">' +
-        '<div class="pb-row-label">' +
-          '<div style="display:flex;align-items:center;gap:8px;"><span style="font-size:15px;font-weight:600;width:58px;display:inline-block;flex-shrink:0;">' + r.name + '</span>' +
-          '<span class="pb-co-badge" style="background:' + coWash + ';color:' + coColor + ';">' + r.company + '</span></div>' +
-          '<div style="display:flex;align-items:center;gap:6px;"><span style="font-size:12px;color:var(--pb-ink-muted);width:58px;display:inline-block;flex-shrink:0;">' + (r.department || "") + '</span>' +
-          '<span class="pb-emp-badge ' + empClass + '">' + (r.employmentType || "-") + '</span></div>' +
-        '</div>' +
-        '<div class="pb-row-track">' + gridlines +
-          '<div style="position:absolute;top:13px;height:8px;left:' + startPct + '%;width:' + totalPct + '%;border-radius:999px;background:#f3e6d1;"></div>' +
-          '<div style="position:absolute;top:13px;height:8px;left:' + startPct + '%;width:' + elapsedPct + '%;border-radius:999px;background:var(--pb-accent);"></div>' +
-          '<div class="pb-m-label" style="left:' + startPct + '%; color:var(--pb-ink-muted);">입사 ' + fmtMD(r.hire) + '</div>' +
-          marker(r.mid, "중간") + marker(r.final, "최종") + marker(r.end, "종료") +
-        '</div>' +
-      '</div>';
-    });
-    document.getElementById("pbRows").innerHTML = rowsHtml;
-
-    var tbodyHtml = "";
-    filtered.forEach(function (r) {
-      function cell(d) {
-        var st = pbStatus(d, today);
-        var cls = st === "done" ? "pb-st-done" : (st === "soon" ? "pb-st-soon" : "pb-st-wait");
-        var inner = st === "done" ? "✓" : "";
-        return '<td><div class="pb-st-cell"><span class="' + cls + '">' + inner + "</span>" + fmtYMD(d) + "</div></td>";
-      }
-      var coWash = r.company === CARE ? "var(--care-wash)" : "var(--mzi-wash)";
-      var coColor = r.company === CARE ? CARE_HEX : MZI_HEX;
-      tbodyHtml += "<tr><td>" + r.name + "</td>" +
-        '<td><span class="pb-co-badge" style="background:' + coWash + ';color:' + coColor + ';">' + r.company + "</span></td>" +
-        "<td>" + (r.department || "") + "</td>" +
-        "<td>" + (r.employmentType || "-") + "</td>" +
-        "<td>" + fmtYMD(r.hire) + "</td>" +
-        cell(r.mid) + cell(r.final) + cell(r.end) +
-        "</tr>";
-    });
-    document.getElementById("pbTableBody").innerHTML = tbodyHtml;
+    renderPbGroup("pbMid", midPending, function (r) { return "중간평가 " + fmtMD(r.mid); }, noteColorFor("mid"));
+    renderPbGroup("pbFinal", finalPending, function (r) { return "최종평가 " + fmtMD(r.final); }, noteColorFor("final"));
+    renderPbGroup("pbExpiring", expiringSoon, function (r) { return "종료 " + fmtMD(r.end); }, noteColorFor("end"));
   }
 
   load();
