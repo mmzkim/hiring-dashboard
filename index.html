@@ -800,18 +800,10 @@ grant select on public.hire_stats to anon;</pre>
       </div>
     </div>
 
-    <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px;">
-      <div class="pb-filters">
-        <button type="button" class="pb-filter-chip active" data-company="all" style="background:var(--pb-accent); color:#fff;">전체</button>
-        <button type="button" class="pb-filter-chip" data-company="GC케어" style="background:var(--care-wash); color:var(--care);">GC케어</button>
-        <button type="button" class="pb-filter-chip" data-company="GC메디아이" style="background:var(--mzi-wash); color:var(--mzi);">GC메디아이</button>
-      </div>
-      <div class="pb-legend">
-        <span class="pb-legend-item"><span class="pb-st-done">✓</span>완료</span>
-        <span class="pb-legend-item"><span class="pb-st-soon"></span>임박 (D-7 이내)</span>
-        <span class="pb-legend-item"><span class="pb-st-wait"></span>예정</span>
-        <span class="pb-legend-item"><span style="width:14px;height:8px;border-radius:999px;background:var(--pb-accent);display:inline-block;"></span>경과 기간</span>
-      </div>
+    <div class="pb-filters">
+      <button type="button" class="pb-filter-chip active" data-company="all" style="background:var(--pb-accent); color:#fff;">전체</button>
+      <button type="button" class="pb-filter-chip" data-company="GC케어" style="background:var(--care-wash); color:var(--care);">GC케어</button>
+      <button type="button" class="pb-filter-chip" data-company="GC메디아이" style="background:var(--mzi-wash); color:var(--mzi);">GC메디아이</button>
     </div>
 
     <div class="pb-panel" id="pbUpcomingPanel" hidden>
@@ -822,28 +814,43 @@ grant select on public.hire_stats to anon;</pre>
       <div class="pb-group-body" id="pbUpcomingBody" hidden></div>
     </div>
 
-    <div class="pb-panel" id="pbMidPanel" hidden>
-      <div class="pb-group-head" id="pbMidToggle">
-        <div class="pb-group-title">중간평가 앞둔 인원 · <span class="n" id="pbMidCount">0</span>명</div>
-        <span class="pb-group-chevron" id="pbMidChevron">▴</span>
+    <div class="panel-shell">
+      <div class="tabnav">
+        <button type="button" class="pb-tab-btn active" data-pbtab="timeline"><span class="num">1</span>타임라인</button>
+        <button type="button" class="pb-tab-btn" data-pbtab="table"><span class="num">2</span>상세 표</button>
       </div>
-      <div class="pb-group-body" id="pbMidBody"></div>
-    </div>
+      <div class="panel-body" style="padding:0;">
+        <div class="pb-legend" style="padding:14px 20px 0 20px;">
+          <span class="pb-legend-item"><span class="pb-st-done">✓</span>완료</span>
+          <span class="pb-legend-item"><span class="pb-st-soon"></span>임박 (D-7 이내)</span>
+          <span class="pb-legend-item"><span class="pb-st-wait"></span>예정</span>
+          <span class="pb-legend-item"><span style="width:14px;height:8px;border-radius:999px;background:var(--pb-accent);display:inline-block;"></span>경과 기간</span>
+        </div>
 
-    <div class="pb-panel" id="pbFinalPanel" hidden>
-      <div class="pb-group-head" id="pbFinalToggle">
-        <div class="pb-group-title">최종평가 앞둔 인원 · <span class="n" id="pbFinalCount">0</span>명</div>
-        <span class="pb-group-chevron" id="pbFinalChevron">▴</span>
-      </div>
-      <div class="pb-group-body" id="pbFinalBody"></div>
-    </div>
+        <div class="pb-panel" id="pbMidPanel" hidden style="border:none; border-radius:0; border-top:1px solid var(--pb-border); margin-top:14px;">
+          <div class="pb-group-head" id="pbMidToggle">
+            <div class="pb-group-title">중간평가 앞둔 인원 · <span class="n" id="pbMidCount">0</span>명</div>
+            <span class="pb-group-chevron" id="pbMidChevron">▴</span>
+          </div>
+          <div class="pb-group-body" id="pbMidBody"></div>
+        </div>
 
-    <div class="pb-panel" id="pbExpiringPanel" hidden>
-      <div class="pb-group-head" id="pbExpiringToggle">
-        <div class="pb-group-title">종료 앞둔 인원 · <span class="n" id="pbExpiringCount">0</span>명</div>
-        <span class="pb-group-chevron" id="pbExpiringChevron">▴</span>
+        <div class="pb-panel" id="pbFinalPanel" hidden style="border:none; border-radius:0; border-top:1px solid var(--pb-border);">
+          <div class="pb-group-head" id="pbFinalToggle">
+            <div class="pb-group-title">최종평가 앞둔 인원 · <span class="n" id="pbFinalCount">0</span>명</div>
+            <span class="pb-group-chevron" id="pbFinalChevron">▴</span>
+          </div>
+          <div class="pb-group-body" id="pbFinalBody"></div>
+        </div>
+
+        <div class="pb-panel" id="pbExpiringPanel" hidden style="border:none; border-radius:0; border-top:1px solid var(--pb-border);">
+          <div class="pb-group-head" id="pbExpiringToggle">
+            <div class="pb-group-title">종료 앞둔 인원 · <span class="n" id="pbExpiringCount">0</span>명</div>
+            <span class="pb-group-chevron" id="pbExpiringChevron">▴</span>
+          </div>
+          <div class="pb-group-body" id="pbExpiringBody"></div>
+        </div>
       </div>
-      <div class="pb-group-body" id="pbExpiringBody"></div>
     </div>
 
     <div class="pb-panel" id="pbCompletedPanel" hidden>
@@ -867,6 +874,7 @@ grant select on public.hire_stats to anon;</pre>
 
   var CARE = "GC케어";
   var MZI = "GC메디아이";
+  var pbSubtab = "timeline";
   var CARE_HEX = "#2f6fed";
   var MZI_HEX = "#ff7a45";
 
@@ -1234,6 +1242,15 @@ grant select on public.hire_stats to anon;</pre>
   pbInfoIconEl.addEventListener("focus", showPbInfoTipFocus);
   pbInfoIconEl.addEventListener("blur", hideTip);
 
+  document.querySelectorAll(".pb-tab-btn").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      pbSubtab = btn.getAttribute("data-pbtab");
+      document.querySelectorAll(".pb-tab-btn").forEach(function (b) { b.classList.toggle("active", b === btn); });
+      document.querySelectorAll(".pb-timeline-view").forEach(function (el) { el.hidden = pbSubtab !== "timeline"; });
+      document.querySelectorAll(".pb-table-view").forEach(function (el) { el.hidden = pbSubtab !== "table"; });
+    });
+  });
+
   document.querySelectorAll(".tab-btn").forEach(function (btn) {
     btn.addEventListener("click", function () {
       document.querySelectorAll(".tab-btn").forEach(function (b) { b.classList.remove("active"); });
@@ -1408,7 +1425,7 @@ grant select on public.hire_stats to anon;</pre>
       '</div>';
     });
 
-    bodyEl.innerHTML =
+    var timelineHtml =
       '<div style="display:flex; padding:14px 20px 0 20px;">' +
         '<div style="width:220px; flex-shrink:0;"></div>' +
         '<div class="pb-axis-months" style="height:14px;">' + todayHtml + '</div>' +
@@ -1418,6 +1435,36 @@ grant select on public.hire_stats to anon;</pre>
         '<div class="pb-axis-months">' + monthsHtml + '</div>' +
       '</div>' +
       '<div>' + rowsHtml + '</div>';
+
+    var tbodyHtml = "";
+    list.forEach(function (r) {
+      function cell(d) {
+        var st = pbStatus(d, today);
+        var cls = st === "done" ? "pb-st-done" : (st === "soon" ? "pb-st-soon" : "pb-st-wait");
+        var inner = st === "done" ? "✓" : "";
+        return '<td><div class="pb-st-cell"><span class="' + cls + '">' + inner + "</span>" + fmtYMD(d) + "</div></td>";
+      }
+      var coWash = r.company === CARE ? "var(--care-wash)" : "var(--mzi-wash)";
+      var coColor = r.company === CARE ? CARE_HEX : MZI_HEX;
+      tbodyHtml += "<tr><td>" + r.name + "</td>" +
+        '<td><span class="pb-co-badge" style="background:' + coWash + ';color:' + coColor + ';">' + r.company + "</span></td>" +
+        "<td>" + (r.department || "") + "</td>" +
+        "<td>" + (r.employmentType || "-") + "</td>" +
+        "<td>" + fmtYMD(r.hire) + "</td>" +
+        cell(r.mid) + cell(r.final) + cell(r.end) +
+        "</tr>";
+    });
+    var tableHtml =
+      '<div style="overflow-x:auto; padding:0 20px 16px 20px;">' +
+        '<table class="pb-tbl">' +
+          '<thead><tr><th>이름</th><th>회사</th><th>부서</th><th>구분</th><th>입사일</th><th>중간평가</th><th>최종평가</th><th>수습종료</th></tr></thead>' +
+          '<tbody>' + tbodyHtml + '</tbody>' +
+        '</table>' +
+      '</div>';
+
+    bodyEl.innerHTML =
+      '<div class="pb-timeline-view"' + (pbSubtab === "table" ? " hidden" : "") + '>' + timelineHtml + '</div>' +
+      '<div class="pb-table-view"' + (pbSubtab === "table" ? "" : " hidden") + '>' + tableHtml + '</div>';
   }
 
   function renderPbGroup(prefix, list, noteFn, noteColorFn, splitByCompany) {
