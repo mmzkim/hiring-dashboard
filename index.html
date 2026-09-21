@@ -770,7 +770,7 @@ grant select on public.hire_stats to anon;</pre>
       </div>
 
       <div class="pb-tile" style="cursor:default;">
-        <div class="pb-tile-title"><span class="pb-dot" style="background:#d9a441;"></span>이번주 평가</div>
+        <div class="pb-tile-title"><span class="pb-dot" style="background:#d9a441;"></span>이번주 요약</div>
         <div class="pb-tile-row" id="pbTilePending">
           <div class="pb-tile-sub-label"><span class="pb-dot" style="width:6px;height:6px;background:#d9a441;"></span>평가예정 인원</div>
           <div class="pb-tile-sub-value" id="pbPendingValue">–</div>
@@ -787,6 +787,15 @@ grant select on public.hire_stats to anon;</pre>
         <div class="pb-popup" id="pbDonePopup" hidden>
           <div class="pb-popup-title" id="pbDonePopupTitle">이번주 평가완료</div>
           <div id="pbDonePopupBody"></div>
+        </div>
+        <div class="pb-tile-divider"></div>
+        <div class="pb-tile-row" id="pbTileWeekEnd">
+          <div class="pb-tile-sub-label"><span class="pb-dot" style="width:6px;height:6px;background:#a9835a;"></span>수습종료 인원</div>
+          <div class="pb-tile-sub-value" id="pbWeekEndValue">–</div>
+        </div>
+        <div class="pb-popup" id="pbWeekEndPopup" hidden>
+          <div class="pb-popup-title" id="pbWeekEndPopupTitle">이번주 수습종료</div>
+          <div id="pbWeekEndPopupBody"></div>
         </div>
       </div>
 
@@ -1314,13 +1323,14 @@ grant select on public.hire_stats to anon;</pre>
   });
 
   [["pbTileInprogress", "inprogress", "pbInprogressPopup"], ["pbTilePending", "pending", "pbPendingPopup"],
-   ["pbTileDone", "done", "pbDonePopup"], ["pbTileExpire", "expire", "pbExpirePopup"]].forEach(function (spec) {
+   ["pbTileDone", "done", "pbDonePopup"], ["pbTileWeekEnd", "weekend", "pbWeekEndPopup"],
+   ["pbTileExpire", "expire", "pbExpirePopup"]].forEach(function (spec) {
     var trigger = document.getElementById(spec[0]);
     if (!trigger) return;
     trigger.addEventListener("click", function (e) {
       if (e.target.closest(".pb-popup")) return;
       pbOpenTile = pbOpenTile === spec[1] ? null : spec[1];
-      ["pbInprogressPopup", "pbPendingPopup", "pbDonePopup", "pbExpirePopup"].forEach(function (id) {
+      ["pbInprogressPopup", "pbPendingPopup", "pbDonePopup", "pbWeekEndPopup", "pbExpirePopup"].forEach(function (id) {
         document.getElementById(id).hidden = id !== spec[2] || pbOpenTile === null;
       });
     });
@@ -1558,6 +1568,14 @@ grant select on public.hire_stats to anon;</pre>
     document.getElementById("pbDonePopupTitle").textContent = "이번주 평가완료 · " + done.length + "명";
     document.getElementById("pbDonePopupBody").innerHTML = done.map(function (p) {
       return popupRow(p.r, p.label + " " + fmtMD(p.date), "var(--pb-done)");
+    }).join("") || '<div style="color:var(--pb-ink-muted);font-size:13px;">해당 인원 없음</div>';
+
+    var weekEndList = filtered.filter(function (r) { return r.end >= weekStart && r.end <= weekEnd; })
+      .sort(function (a, b) { return a.end - b.end; });
+    document.getElementById("pbWeekEndValue").textContent = weekEndList.length + "명";
+    document.getElementById("pbWeekEndPopupTitle").textContent = "이번주 수습종료 · " + weekEndList.length + "명";
+    document.getElementById("pbWeekEndPopupBody").innerHTML = weekEndList.map(function (r) {
+      return popupRow(r, "종료 " + fmtMD(r.end), pbStatus(r.end, today) === "soon" ? "var(--pb-soon)" : "var(--pb-ink-muted)");
     }).join("") || '<div style="color:var(--pb-ink-muted);font-size:13px;">해당 인원 없음</div>';
 
     var year = today.getFullYear(), month = today.getMonth();
