@@ -139,7 +139,7 @@
     align-items: center;
     gap: 10px;
   }
-  #updatedAt {
+  #updatedAt, #pbUpdatedAt {
     font-size: 12px;
     color: var(--ink-muted);
     font-variant-numeric: tabular-nums;
@@ -549,6 +549,13 @@
   .pb-subtab { padding: 6px 14px; border-radius: 999px; font-size: 13px; font-weight: 500; cursor: pointer; border: 1px solid var(--pb-border); background: var(--pb-card); color: var(--pb-ink-muted); }
   .pb-subtab.active { background: var(--pb-accent); border-color: var(--pb-accent); color: #fff; font-weight: 600; }
 
+  .pb-group-head { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; cursor: pointer; }
+  .pb-group-head:hover { background: var(--pb-page); }
+  .pb-group-title { font-size: 13px; font-weight: 600; color: var(--pb-ink-2); }
+  .pb-group-title .n { color: var(--pb-accent); }
+  .pb-group-chevron { font-size: 12px; color: var(--pb-ink-muted); transition: transform .15s; }
+  .pb-group-body { padding: 4px 20px 16px 20px; display: flex; flex-direction: column; gap: 8px; border-top: 1px solid var(--pb-border); }
+
   .pb-co-badge { display: inline-block; padding: 2px 9px; border-radius: 999px; font-size: 11px; font-weight: 600; }
   .pb-emp-badge { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 600; background: #f2efe9; color: var(--pb-ink-2); }
   .pb-emp-badge.contract { background: #faf0de; color: #b8763a; }
@@ -828,7 +835,23 @@ grant select on public.hire_stats to anon;</pre>
       </div>
     </div>
 
-    <div class="footnote">중간평가=입사일+40일, 최종평가=입사일+70일, 수습종료=입사일+90일 기준으로 자동 계산됩니다. 수습이 이미 종료된 인원은 목록에서 자동으로 빠집니다.</div>
+    <div class="pb-panel" id="pbUpcomingPanel" hidden>
+      <div class="pb-group-head" id="pbUpcomingToggle">
+        <div class="pb-group-title">입사예정 인원 · <span class="n" id="pbUpcomingCount">0</span>명</div>
+        <span class="pb-group-chevron" id="pbUpcomingChevron">▾</span>
+      </div>
+      <div class="pb-group-body" id="pbUpcomingBody" hidden></div>
+    </div>
+
+    <div class="pb-panel" id="pbCompletedPanel" hidden>
+      <div class="pb-group-head" id="pbCompletedToggle">
+        <div class="pb-group-title">수습 종료 인원 · <span class="n" id="pbCompletedCount">0</span>명</div>
+        <span class="pb-group-chevron" id="pbCompletedChevron">▾</span>
+      </div>
+      <div class="pb-group-body" id="pbCompletedBody" hidden></div>
+    </div>
+
+    <div class="footnote">중간평가=입사일+40일, 최종평가=입사일+70일, 수습종료=입사일+90일 기준으로 자동 계산됩니다. 타임라인·표에는 현재 수습 진행중인 인원만 표시되며, 입사예정·수습종료 인원은 위 목록에서 펼쳐볼 수 있습니다.</div>
   </div>
 </div>
 
@@ -855,6 +878,8 @@ grant select on public.hire_stats to anon;</pre>
   var upcomingList = [];
   var infoIconEl = document.getElementById("infoIcon");
   var INFO_TEXT = "온보딩캘린더에 등록된 GC케어·GC메디아이 신규입사자 데이터를 자동으로 집계합니다.<br>전체 사용자의 데이터가 실시간 반영됩니다.";
+  var pbInfoIconEl = document.getElementById("pbInfoIcon");
+  var PB_INFO_TEXT = "온보딩캘린더에 등록된 입사일을 기준으로 중간평가(입사+40일)·최종평가(입사+70일)·수습종료(입사+90일) 일정을 자동으로 계산합니다.<br>전체 사용자의 데이터가 실시간 반영됩니다.";
 
   var pbLoadingEl = document.getElementById("pbLoadingState");
   var pbErrorEl = document.getElementById("pbErrorState");
@@ -882,9 +907,11 @@ grant select on public.hire_stats to anon;</pre>
     updatedAtEl.textContent = "불러오는 중…";
     var url = SUPABASE_URL + "/rest/v1/hire_stats?select=name,company,hire_date,department,employment_type&order=hire_date.asc";
     fetch(url, {
+      cache: "no-store",
       headers: {
         apikey: ANON_KEY,
-        Authorization: "Bearer " + ANON_KEY
+        Authorization: "Bearer " + ANON_KEY,
+        "Cache-Control": "no-cache"
       }
     })
       .then(function (res) {
@@ -1148,6 +1175,20 @@ grant select on public.hire_stats to anon;</pre>
     tooltipEl.classList.add("show");
   }
 
+  function showPbInfoTip(evt) {
+    tooltipEl.innerHTML = PB_INFO_TEXT;
+    tooltipEl.style.left = evt.clientX + "px";
+    tooltipEl.style.top = (evt.clientY - 10) + "px";
+    tooltipEl.classList.add("show");
+  }
+  function showPbInfoTipFocus() {
+    var rect = pbInfoIconEl.getBoundingClientRect();
+    tooltipEl.innerHTML = PB_INFO_TEXT;
+    tooltipEl.style.left = (rect.left + rect.width / 2) + "px";
+    tooltipEl.style.top = (rect.top - 8) + "px";
+    tooltipEl.classList.add("show");
+  }
+
   function showUpcomingTip(evt) {
     if (!upcomingList.length) return;
     var html = upcomingList.map(function (r) {
@@ -1184,6 +1225,11 @@ grant select on public.hire_stats to anon;</pre>
   infoIconEl.addEventListener("mouseleave", hideTip);
   infoIconEl.addEventListener("focus", showInfoTipFocus);
   infoIconEl.addEventListener("blur", hideTip);
+
+  pbInfoIconEl.addEventListener("mousemove", showPbInfoTip);
+  pbInfoIconEl.addEventListener("mouseleave", hideTip);
+  pbInfoIconEl.addEventListener("focus", showPbInfoTipFocus);
+  pbInfoIconEl.addEventListener("blur", hideTip);
 
   document.querySelectorAll(".tab-btn").forEach(function (btn) {
     btn.addEventListener("click", function () {
@@ -1278,6 +1324,18 @@ grant select on public.hire_stats to anon;</pre>
 
   document.getElementById("pbRefreshBtn").addEventListener("click", load);
 
+  ["pbUpcoming", "pbCompleted"].forEach(function (prefix) {
+    var head = document.getElementById(prefix + "Toggle");
+    if (!head) return;
+    head.addEventListener("click", function () {
+      var bodyEl = document.getElementById(prefix + "Body");
+      var chevronEl = document.getElementById(prefix + "Chevron");
+      var willOpen = bodyEl.hidden;
+      bodyEl.hidden = !willOpen;
+      if (chevronEl) chevronEl.textContent = willOpen ? "▴" : "▾";
+    });
+  });
+
   function popupRow(r, note, noteColor) {
     var badgeClass = r.company === CARE ? "care-wash" : "mzi-wash";
     var color = r.company === CARE ? CARE_HEX : MZI_HEX;
@@ -1287,10 +1345,22 @@ grant select on public.hire_stats to anon;</pre>
       '<span style="color:' + (noteColor || "var(--pb-ink-muted)") + ';font-size:12px;">' + note + "</span></div>";
   }
 
+  function renderPbGroup(prefix, list, noteFn, noteColorFn) {
+    var panelEl = document.getElementById(prefix + "Panel");
+    var countEl = document.getElementById(prefix + "Count");
+    var bodyEl = document.getElementById(prefix + "Body");
+    if (!panelEl) return;
+    panelEl.hidden = list.length === 0;
+    countEl.textContent = list.length;
+    bodyEl.innerHTML = list.map(function (r) {
+      return popupRow(r, noteFn(r), noteColorFn ? noteColorFn(r) : null);
+    }).join("") || '<div style="color:var(--pb-ink-muted);font-size:13px;">해당 인원 없음</div>';
+  }
+
   function renderProbation(rows) {
     pbLastRows = rows;
     var today = toMidnight(new Date());
-    var withDates = rows.map(function (r) {
+    var allRows = rows.map(function (r) {
       var hire = toMidnight(new Date(r.hire_date + "T00:00:00"));
       return {
         name: r.name,
@@ -1302,12 +1372,22 @@ grant select on public.hire_stats to anon;</pre>
         final: addDays(hire, 70),
         end: addDays(hire, 90)
       };
-    }).filter(function (r) { return r.end >= today; })
+    });
+
+    var byCompany = pbCompanyFilter === "all" ? allRows : allRows.filter(function (r) { return r.company === pbCompanyFilter; });
+
+    // ── 세 그룹으로 분류: 입사예정 / 진행중(수습) / 수습종료 ──
+    var upcoming = byCompany.filter(function (r) { return r.hire > today; })
+      .sort(function (a, b) { return a.hire - b.hire; });
+    var completed = byCompany.filter(function (r) { return r.end < today; })
+      .sort(function (a, b) { return b.end - a.end; });
+    var filtered = byCompany.filter(function (r) { return r.hire <= today && r.end >= today; })
       .sort(function (a, b) { return a.hire - b.hire; });
 
-    var filtered = pbCompanyFilter === "all" ? withDates : withDates.filter(function (r) { return r.company === pbCompanyFilter; });
+    renderPbGroup("pbUpcoming", upcoming, function (r) { return "입사예정 " + fmtMD(r.hire); });
+    renderPbGroup("pbCompleted", completed, function (r) { return "종료 " + fmtMD(r.end); }, function () { return "var(--pb-ink-muted)"; });
 
-    // ── 상단 타일 ──
+    // ── 상단 타일 (진행중 인원 기준) ──
     document.getElementById("pbInprogressValue").innerHTML = filtered.length + '<span class="u">명</span>';
     document.getElementById("pbInprogressPopupTitle").textContent = "진행중 인원 · " + filtered.length + "명";
     document.getElementById("pbInprogressPopupBody").innerHTML = filtered.map(function (r) {
@@ -1406,7 +1486,7 @@ grant select on public.hire_stats to anon;</pre>
           '<div style="display:flex;align-items:center;gap:8px;"><span style="font-size:15px;font-weight:600;width:58px;display:inline-block;flex-shrink:0;">' + r.name + '</span>' +
           '<span class="pb-co-badge" style="background:' + coWash + ';color:' + coColor + ';">' + r.company + '</span></div>' +
           '<div style="display:flex;align-items:center;gap:6px;"><span style="font-size:12px;color:var(--pb-ink-muted);width:58px;display:inline-block;flex-shrink:0;">' + (r.department || "") + '</span>' +
-          '<span class="pb-emp-badge ' + empClass + '">' + r.employmentType + '</span></div>' +
+          '<span class="pb-emp-badge ' + empClass + '">' + (r.employmentType || "-") + '</span></div>' +
         '</div>' +
         '<div class="pb-row-track">' + gridlines +
           '<div style="position:absolute;top:13px;height:8px;left:' + startPct + '%;width:' + totalPct + '%;border-radius:999px;background:#f3e6d1;"></div>' +
@@ -1431,7 +1511,7 @@ grant select on public.hire_stats to anon;</pre>
       tbodyHtml += "<tr><td>" + r.name + "</td>" +
         '<td><span class="pb-co-badge" style="background:' + coWash + ';color:' + coColor + ';">' + r.company + "</span></td>" +
         "<td>" + (r.department || "") + "</td>" +
-        "<td>" + r.employmentType + "</td>" +
+        "<td>" + (r.employmentType || "-") + "</td>" +
         "<td>" + fmtYMD(r.hire) + "</td>" +
         cell(r.mid) + cell(r.final) + cell(r.end) +
         "</tr>";
