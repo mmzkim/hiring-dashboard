@@ -584,7 +584,7 @@
   .pb-today-label { position: absolute; transform: translateX(-50%); font-size: 10px; font-weight: 700; color: var(--pb-soon); white-space: nowrap; }
 
   table.pb-tbl { border-collapse: separate; border-spacing: 0; width: 100%; }
-  table.pb-tbl th, table.pb-tbl td { padding: 13px 10px; text-align: center; border-bottom: 1px solid var(--pb-border); font-size: 13.5px; }
+  table.pb-tbl th, table.pb-tbl td { padding: 13px 10px; text-align: center; border-bottom: 1px solid var(--pb-border); font-size: 13.5px; white-space: nowrap; }
   table.pb-tbl thead th { font-size: 12px; font-weight: 600; color: var(--pb-ink-2); background: #f7f1e7; }
   table.pb-tbl tbody tr:last-child td { border-bottom: none; }
   .pb-st-cell { display: flex; align-items: center; justify-content: center; gap: 6px; }
@@ -870,7 +870,7 @@ grant select on public.hire_stats to anon;</pre>
       <div class="pb-group-body" id="pbCompletedBody" hidden></div>
     </div>
 
-    <div class="footnote">중간평가=입사일+40일, 최종평가=입사일+70일, 수습종료=입사일+90일 기준으로 자동 계산됩니다. 진행중 인원은 다음 일정(중간평가/최종평가/종료) 기준으로 나눠서 표시되며, 입사예정·수습종료 인원은 위/아래 목록에서 펼쳐볼 수 있습니다.</div>
+    <div class="footnote">중간평가 마감=입사일+47일, 최종평가 마감=입사일+77일, 수습종료=입사일+90일 기준으로 자동 계산됩니다. 진행중 인원은 다음 일정(중간평가/최종평가/종료) 기준으로 나눠서 표시되며, 입사예정·수습종료 인원은 위/아래 목록에서 펼쳐볼 수 있습니다.</div>
   </div>
 </div>
 
@@ -1521,8 +1521,8 @@ grant select on public.hire_stats to anon;</pre>
         department: r.department,
         employmentType: r.employment_type,
         hire: hire,
-        mid: addDays(hire, 40),
-        final: addDays(hire, 70),
+        mid: addDays(hire, 47),
+        final: addDays(hire, 77),
         end: addDays(hire, 90)
       };
     });
