@@ -905,7 +905,7 @@ grant select on public.hire_stats to anon;</pre>
   function load() {
     setState("loading");
     updatedAtEl.textContent = "불러오는 중…";
-    var url = SUPABASE_URL + "/rest/v1/hire_stats?select=name,company,hire_date,department,employment_type&order=hire_date.asc";
+    var url = SUPABASE_URL + "/rest/v1/hire_stats?select=name,company,hire_date,department,employment_type,probation_exempt&order=hire_date.asc";
     fetch(url, {
       cache: "no-store",
       headers: {
@@ -1360,7 +1360,8 @@ grant select on public.hire_stats to anon;</pre>
   function renderProbation(rows) {
     pbLastRows = rows;
     var today = toMidnight(new Date());
-    var allRows = rows.map(function (r) {
+    var eligibleRows = rows.filter(function (r) { return !r.probation_exempt; });
+    var allRows = eligibleRows.map(function (r) {
       var hire = toMidnight(new Date(r.hire_date + "T00:00:00"));
       return {
         name: r.name,
