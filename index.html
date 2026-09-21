@@ -28,6 +28,18 @@
     --teal-wash:    #e3faf6;
     --violet:       #7c5cfc;
     --violet-wash:  #f0ecff;
+
+    /* 수습현황 보드 전용 (은은한 앰버 톤) */
+    --pb-page:      #faf6f0;
+    --pb-card:      #ffffff;
+    --pb-border:    #ece2d3;
+    --pb-ink:       #211d18;
+    --pb-ink-2:     #6b6156;
+    --pb-ink-muted: #a89d8d;
+    --pb-accent:    #c98a46;
+    --pb-done:      #3f7a4a;
+    --pb-soon:      #c9722c;
+    --pb-wait:      #b9ac96;
   }
 
   * { box-sizing: border-box; }
@@ -145,6 +157,22 @@
   }
   button.iconbtn:hover { color: var(--ink); border-color: #c9cedb; }
   button.iconbtn:focus-visible { outline: 2px solid var(--care); outline-offset: 2px; }
+
+  .page-pills { display: flex; gap: 6px; }
+  .page-pill {
+    border: none;
+    border-radius: 999px;
+    padding: 7px 15px;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    background: var(--card);
+    color: var(--ink-muted);
+    border: 1px solid var(--border);
+  }
+  .page-pill.active { background: var(--care); color: #fff; border-color: var(--care); }
+  #probationPage .page-pill.active { background: var(--pb-accent); border-color: var(--pb-accent); }
 
   /* stat tiles */
   .tiles {
@@ -439,11 +467,119 @@
     margin-top: 12px;
     color: var(--ink);
   }
+
+  /* ── 수습현황 보드 ─────────────────────────────────────────────── */
+  body.showing-probation { background: var(--pb-page); }
+  #probationPage { color: var(--pb-ink); }
+  #probationPage .kicker { color: var(--pb-accent); }
+
+  .pb-tiles { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 12px; align-items: stretch; }
+  @media (max-width: 640px) { .pb-tiles { grid-template-columns: 1fr; } }
+  .pb-tile {
+    position: relative;
+    background: var(--pb-card);
+    border: 1px solid var(--pb-border);
+    border-radius: 14px;
+    padding: 18px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    cursor: pointer;
+  }
+  .pb-tile-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--pb-ink);
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--pb-border);
+  }
+  .pb-dot { width: 8px; height: 8px; border-radius: 999px; display: inline-block; flex-shrink: 0; }
+  .pb-tile-value { font-size: 28px; font-weight: 700; color: var(--pb-ink); }
+  .pb-tile-value .u { font-size: 15px; font-weight: 500; color: var(--pb-ink-muted); }
+  .pb-tile-row { display: flex; align-items: center; justify-content: space-between; cursor: pointer; }
+  .pb-tile-row + .pb-tile-row { margin-top: 0; }
+  .pb-tile-sub-label { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--pb-ink-muted); }
+  .pb-tile-sub-value { font-size: 19px; font-weight: 700; color: var(--pb-ink); }
+  .pb-tile-divider { height: 1px; background: var(--pb-border); }
+  .pb-popup {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    width: 250px;
+    background: var(--pb-card);
+    border: 1px solid var(--pb-border);
+    border-radius: 12px;
+    box-shadow: 0 10px 28px rgba(33,29,24,0.16);
+    padding: 14px 16px;
+    z-index: 30;
+    cursor: default;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .pb-popup-title { font-size: 12px; font-weight: 600; color: var(--pb-ink-muted); }
+  .pb-popup-row { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--pb-ink); }
+
+  .pb-filters { display: flex; gap: 8px; }
+  .pb-filter-chip {
+    padding: 7px 16px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid transparent;
+  }
+
+  .pb-panel { background: var(--pb-card); border: 1px solid var(--pb-border); border-radius: 14px; overflow: hidden; }
+  .pb-panel-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--pb-border);
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .pb-legend { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .pb-legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--pb-ink-2); }
+  .pb-subtabs { display: flex; gap: 6px; }
+  .pb-subtab { padding: 6px 14px; border-radius: 999px; font-size: 13px; font-weight: 500; cursor: pointer; border: 1px solid var(--pb-border); background: var(--pb-card); color: var(--pb-ink-muted); }
+  .pb-subtab.active { background: var(--pb-accent); border-color: var(--pb-accent); color: #fff; font-weight: 600; }
+
+  .pb-co-badge { display: inline-block; padding: 2px 9px; border-radius: 999px; font-size: 11px; font-weight: 600; }
+  .pb-emp-badge { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 600; background: #f2efe9; color: var(--pb-ink-2); }
+  .pb-emp-badge.contract { background: #faf0de; color: #b8763a; }
+
+  .pb-row { display: flex; align-items: flex-start; gap: 20px; padding: 14px 20px; border-bottom: 1px solid var(--pb-border); }
+  .pb-row:last-child { border-bottom: none; }
+  .pb-row-label { width: 220px; flex-shrink: 0; display: flex; flex-direction: column; gap: 4px; }
+  .pb-row-track { flex-grow: 1; position: relative; height: 44px; }
+  .pb-gline { position: absolute; top: 0; height: 44px; width: 1px; background: #efe6d6; }
+  .pb-m-done { position: absolute; border-radius: 50%; background: var(--pb-done); box-shadow: 0 0 0 2px var(--pb-card); display: flex; align-items: center; justify-content: center; z-index: 2; top: 9px; width: 16px; height: 16px; transform: translate(-50%,0); }
+  .pb-m-soon { position: absolute; background: var(--pb-soon); box-shadow: 0 0 0 2px var(--pb-card); z-index: 2; top: 10px; width: 13px; height: 13px; transform: translate(-50%,0) rotate(45deg); }
+  .pb-m-wait { position: absolute; border-radius: 50%; background: var(--pb-card); border: 2px solid var(--pb-wait); box-sizing: border-box; z-index: 2; top: 9px; width: 16px; height: 16px; transform: translate(-50%,0); }
+  .pb-m-label { position: absolute; font-size: 10px; white-space: nowrap; top: 26px; }
+
+  .pb-axis-months { flex-grow: 1; position: relative; height: 16px; }
+  .pb-axis-months span { position: absolute; transform: translateX(-50%); font-size: 11px; color: var(--pb-ink-muted); }
+  .pb-today-label { position: absolute; transform: translateX(-50%); font-size: 10px; font-weight: 700; color: var(--pb-soon); white-space: nowrap; }
+
+  table.pb-tbl { border-collapse: separate; border-spacing: 0; width: 100%; }
+  table.pb-tbl th, table.pb-tbl td { padding: 13px 10px; text-align: center; border-bottom: 1px solid var(--pb-border); font-size: 13.5px; }
+  table.pb-tbl thead th { font-size: 12px; font-weight: 600; color: var(--pb-ink-2); background: #f7f1e7; }
+  table.pb-tbl tbody tr:last-child td { border-bottom: none; }
+  .pb-st-cell { display: flex; align-items: center; justify-content: center; gap: 6px; }
+  .pb-st-done { display: inline-flex; align-items: center; justify-content: center; width: 14px; height: 14px; border-radius: 50%; background: var(--pb-done); color: #fff; font-size: 9px; font-weight: 700; flex-shrink: 0; }
+  .pb-st-soon { display: inline-block; width: 10px; height: 10px; background: var(--pb-soon); transform: rotate(45deg); flex-shrink: 0; }
+  .pb-st-wait { display: inline-block; width: 11px; height: 11px; border-radius: 50%; background: var(--pb-card); border: 2px solid var(--pb-wait); box-sizing: border-box; flex-shrink: 0; }
 </style>
 </head>
 <body>
 
-<div class="wrap">
+<div class="wrap" id="hirePage">
   <header class="top">
     <div class="title-block">
       <span class="kicker">HR · Recruitment</span>
@@ -454,9 +590,15 @@
         <span class="sync-badge"><span class="sync-dot"></span>온보딩캘린더 연동</span>
       </div>
     </div>
-    <div class="refresh-row">
-      <span id="updatedAt">불러오는 중…</span>
-      <button class="iconbtn" id="refreshBtn" type="button">새로고침</button>
+    <div style="display:flex; flex-direction:column; align-items:flex-end; gap:10px;">
+      <div class="page-pills">
+        <button type="button" class="page-pill active" data-page="hire">입사현황</button>
+        <button type="button" class="page-pill" data-page="probation">수습현황</button>
+      </div>
+      <div class="refresh-row">
+        <span id="updatedAt">불러오는 중…</span>
+        <button class="iconbtn" id="refreshBtn" type="button">새로고침</button>
+      </div>
     </div>
   </header>
 
@@ -567,6 +709,129 @@ grant select on public.hire_stats to anon;</pre>
   </div>
 </div>
 
+<div class="wrap" id="probationPage" hidden>
+  <header class="top">
+    <div class="title-block">
+      <span class="kicker">HR · Recruitment</span>
+      <h1>수습 현황 보드<span class="info-icon" id="pbInfoIcon" tabindex="0" aria-label="보드 설명">ⓘ</span></h1>
+      <div class="subtitle-row">
+        <span class="chip chip-care">GC케어</span>
+        <span class="chip chip-mzi">GC메디아이</span>
+        <span class="sync-badge"><span class="sync-dot"></span>온보딩캘린더 연동</span>
+      </div>
+    </div>
+    <div style="display:flex; flex-direction:column; align-items:flex-end; gap:10px;">
+      <div class="page-pills">
+        <button type="button" class="page-pill" data-page="hire">입사현황</button>
+        <button type="button" class="page-pill active" data-page="probation">수습현황</button>
+      </div>
+      <div class="refresh-row">
+        <span id="pbUpdatedAt">불러오는 중…</span>
+        <button class="iconbtn" id="pbRefreshBtn" type="button">새로고침</button>
+      </div>
+    </div>
+  </header>
+
+  <div id="pbLoadingState" class="state-card">
+    <div class="big">⏳</div>
+    데이터를 불러오는 중입니다…
+  </div>
+
+  <div id="pbErrorState" class="state-card" hidden>
+    <div class="big">⚠️</div>
+    <div id="pbErrorMsg">데이터를 불러오지 못했습니다.</div>
+  </div>
+
+  <div id="pbContent" hidden style="display:flex; flex-direction:column; gap:18px;">
+    <div class="pb-tiles">
+      <div class="pb-tile" id="pbTileInprogress">
+        <div class="pb-tile-title"><span class="pb-dot" style="background:var(--pb-accent);"></span>진행중 인원</div>
+        <div class="pb-tile-value" id="pbInprogressValue">–</div>
+        <div class="pb-popup" id="pbInprogressPopup" hidden>
+          <div class="pb-popup-title" id="pbInprogressPopupTitle">진행중 인원</div>
+          <div id="pbInprogressPopupBody"></div>
+        </div>
+      </div>
+
+      <div class="pb-tile" style="cursor:default;">
+        <div class="pb-tile-title"><span class="pb-dot" style="background:#d9a441;"></span>이번주 평가</div>
+        <div class="pb-tile-row" id="pbTilePending">
+          <div class="pb-tile-sub-label"><span class="pb-dot" style="width:6px;height:6px;background:#d9a441;"></span>평가예정 인원</div>
+          <div class="pb-tile-sub-value" id="pbPendingValue">–</div>
+        </div>
+        <div class="pb-popup" id="pbPendingPopup" hidden>
+          <div class="pb-popup-title" id="pbPendingPopupTitle">이번주 평가예정</div>
+          <div id="pbPendingPopupBody"></div>
+        </div>
+        <div class="pb-tile-divider"></div>
+        <div class="pb-tile-row" id="pbTileDone">
+          <div class="pb-tile-sub-label"><span class="pb-dot" style="width:6px;height:6px;background:var(--pb-done);"></span>평가완료 인원</div>
+          <div class="pb-tile-sub-value" id="pbDoneValue">–</div>
+        </div>
+        <div class="pb-popup" id="pbDonePopup" hidden>
+          <div class="pb-popup-title" id="pbDonePopupTitle">이번주 평가완료</div>
+          <div id="pbDonePopupBody"></div>
+        </div>
+      </div>
+
+      <div class="pb-tile" id="pbTileExpire">
+        <div class="pb-tile-title"><span class="pb-dot" style="background:#a9835a;"></span>이번달 수습만료</div>
+        <div class="pb-tile-value" id="pbExpireValue">–</div>
+        <div class="pb-popup" id="pbExpirePopup" hidden style="left:auto; right:0;">
+          <div class="pb-popup-title" id="pbExpirePopupTitle">이번달 수습만료</div>
+          <div id="pbExpirePopupBody"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pb-filters">
+      <button type="button" class="pb-filter-chip active" data-company="all" style="background:var(--pb-accent); color:#fff;">전체</button>
+      <button type="button" class="pb-filter-chip" data-company="GC케어" style="background:var(--care-wash); color:var(--care);">GC케어</button>
+      <button type="button" class="pb-filter-chip" data-company="GC메디아이" style="background:var(--mzi-wash); color:var(--mzi);">GC메디아이</button>
+    </div>
+
+    <div class="pb-panel">
+      <div class="pb-panel-head">
+        <div class="pb-legend">
+          <span class="pb-legend-item"><span class="pb-st-done">✓</span>완료</span>
+          <span class="pb-legend-item"><span class="pb-st-soon"></span>임박 (D-7 이내)</span>
+          <span class="pb-legend-item"><span class="pb-st-wait"></span>예정</span>
+          <span class="pb-legend-item"><span style="width:14px;height:8px;border-radius:999px;background:var(--pb-accent);display:inline-block;"></span>경과 기간</span>
+        </div>
+        <div class="pb-subtabs">
+          <button type="button" class="pb-subtab active" data-subtab="timeline">타임라인</button>
+          <button type="button" class="pb-subtab" data-subtab="table">표</button>
+        </div>
+      </div>
+
+      <div id="pbTimelineView">
+        <div style="display:flex; padding:14px 20px 0 20px;">
+          <div style="width:220px; flex-shrink:0;"></div>
+          <div class="pb-axis-months" id="pbTodayRow" style="height:14px;"></div>
+        </div>
+        <div style="display:flex; padding:2px 20px 10px 20px; border-bottom:1px solid var(--pb-border);">
+          <div style="width:220px; flex-shrink:0;"></div>
+          <div class="pb-axis-months" id="pbMonthAxis"></div>
+        </div>
+        <div id="pbRows"></div>
+      </div>
+
+      <div id="pbTableView" hidden style="overflow-x:auto;">
+        <table class="pb-tbl">
+          <thead>
+            <tr>
+              <th>이름</th><th>회사</th><th>부서</th><th>구분</th><th>입사일</th><th>중간평가 예정일</th><th>최종평가 예정일</th><th>수습종료일</th>
+            </tr>
+          </thead>
+          <tbody id="pbTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="footnote">중간평가=입사일+40일, 최종평가=입사일+70일, 수습종료=입사일+90일 기준으로 자동 계산됩니다. 수습이 이미 종료된 인원은 목록에서 자동으로 빠집니다.</div>
+  </div>
+</div>
+
 <div id="tooltip"></div>
 
 <script>
@@ -591,10 +856,18 @@ grant select on public.hire_stats to anon;</pre>
   var infoIconEl = document.getElementById("infoIcon");
   var INFO_TEXT = "온보딩캘린더에 등록된 GC케어·GC메디아이 신규입사자 데이터를 자동으로 집계합니다.<br>전체 사용자의 데이터가 실시간 반영됩니다.";
 
+  var pbLoadingEl = document.getElementById("pbLoadingState");
+  var pbErrorEl = document.getElementById("pbErrorState");
+  var pbContentEl = document.getElementById("pbContent");
+  var pbUpdatedAtEl = document.getElementById("pbUpdatedAt");
+
   function setState(state) {
     loadingEl.hidden = state !== "loading";
     errorEl.hidden = state !== "error";
     contentEl.hidden = state !== "content";
+    pbLoadingEl.hidden = state !== "loading";
+    pbErrorEl.hidden = state !== "error";
+    pbContentEl.hidden = state !== "content";
   }
 
   function fmtTime(d) {
@@ -607,7 +880,7 @@ grant select on public.hire_stats to anon;</pre>
   function load() {
     setState("loading");
     updatedAtEl.textContent = "불러오는 중…";
-    var url = SUPABASE_URL + "/rest/v1/hire_stats?select=name,company,hire_date,department&order=hire_date.asc";
+    var url = SUPABASE_URL + "/rest/v1/hire_stats?select=name,company,hire_date,department,employment_type&order=hire_date.asc";
     fetch(url, {
       headers: {
         apikey: ANON_KEY,
@@ -625,7 +898,9 @@ grant select on public.hire_stats to anon;</pre>
       .then(function (rows) {
         render(rows);
         setState("content");
-        updatedAtEl.textContent = fmtTime(new Date());
+        var t = fmtTime(new Date());
+        updatedAtEl.textContent = t;
+        pbUpdatedAtEl.textContent = t;
       })
       .catch(function (err) {
         console.error(err);
@@ -640,6 +915,7 @@ grant select on public.hire_stats to anon;</pre>
           errorMsgEl.textContent = "데이터를 불러오지 못했습니다. 네트워크 상태를 확인하고 다시 시도해주세요.";
           errorSqlEl.hidden = true;
         }
+        document.getElementById("pbErrorMsg").textContent = errorMsgEl.textContent;
         setState("error");
       });
   }
@@ -671,9 +947,23 @@ grant select on public.hire_stats to anon;</pre>
     var byMonth = months.map(function (m) {
       var mm = String(m).padStart(2, "0");
       var inMonth = confirmed.filter(function (r) { return r.hire_date.slice(5, 7) === mm; });
-      var care = inMonth.filter(function (r) { return r.company === CARE; }).length;
-      var mzi = inMonth.filter(function (r) { return r.company === MZI; }).length;
-      return { m: m, care: care, mzi: mzi, total: care + mzi, partial: m === curMonth };
+      var careRows = inMonth.filter(function (r) { return r.company === CARE; });
+      var mziRows = inMonth.filter(function (r) { return r.company === MZI; });
+      function typeBreak(rs) {
+        return {
+          regular: rs.filter(function (r) { return r.employment_type === "정규직"; }).length,
+          contract: rs.filter(function (r) { return r.employment_type === "계약직"; }).length
+        };
+      }
+      return {
+        m: m,
+        care: careRows.length,
+        mzi: mziRows.length,
+        careType: typeBreak(careRows),
+        mziType: typeBreak(mziRows),
+        total: careRows.length + mziRows.length,
+        partial: m === curMonth
+      };
     });
 
     var totalCare = confirmed.filter(function (r) { return r.company === CARE; }).length;
@@ -715,6 +1005,8 @@ grant select on public.hire_stats to anon;</pre>
 
     drawChart(byMonth);
     buildTable(byMonth, upcoming.length);
+
+    renderProbation(clean);
   }
 
   function drawDonut(care, mzi, total) {
@@ -832,7 +1124,10 @@ grant select on public.hire_stats to anon;</pre>
   function showTip(evt, item, which) {
     var name = which === "care" ? "GC케어" : "GC메디아이";
     var val = which === "care" ? item.care : item.mzi;
-    tooltipEl.innerHTML = item.m + "월 · " + name + " <b>" + val + "명</b>" + (item.partial ? "<br><span style='opacity:.7'>진행 중인 달</span>" : "");
+    var type = which === "care" ? item.careType : item.mziType;
+    tooltipEl.innerHTML = item.m + "월 · " + name + " <b>" + val + "명</b>" +
+      "<br><span style='opacity:.75'>정규직 " + type.regular + "명 · 계약직 " + type.contract + "명</span>" +
+      (item.partial ? "<br><span style='opacity:.7'>진행 중인 달</span>" : "");
     tooltipEl.style.left = evt.clientX + "px";
     tooltipEl.style.top = (evt.clientY - 10) + "px";
     tooltipEl.classList.add("show");
@@ -899,6 +1194,250 @@ grant select on public.hire_stats to anon;</pre>
       document.getElementById("tableTab").hidden = tab !== "table";
     });
   });
+
+  // ── 페이지 전환 (입사현황 ↔ 수습현황) ──────────────────────────────
+  var hirePageEl = document.getElementById("hirePage");
+  var probationPageEl = document.getElementById("probationPage");
+  function showPage(page) {
+    hirePageEl.hidden = page !== "hire";
+    probationPageEl.hidden = page !== "probation";
+    document.body.classList.toggle("showing-probation", page === "probation");
+    document.querySelectorAll(".page-pill").forEach(function (btn) {
+      btn.classList.toggle("active", btn.getAttribute("data-page") === page);
+    });
+  }
+  document.querySelectorAll(".page-pill").forEach(function (btn) {
+    btn.addEventListener("click", function () { showPage(btn.getAttribute("data-page")); });
+  });
+
+  // ── 수습현황 보드 ──────────────────────────────────────────────────
+  var DAY_MS = 24 * 60 * 60 * 1000;
+  var pbCompanyFilter = "all";
+  var pbSubtab = "timeline";
+  var pbOpenTile = null;
+  var pbLastRows = [];
+
+  function toMidnight(d) { var x = new Date(d); x.setHours(0, 0, 0, 0); return x; }
+  function addDays(d, n) { return new Date(d.getTime() + n * DAY_MS); }
+  function fmtMD(d) { return (d.getMonth() + 1) + "/" + d.getDate(); }
+  function fmtYMD(d) { return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); }
+  function pbStatus(date, today) {
+    var diffDays = Math.round((date - today) / DAY_MS);
+    if (diffDays < 0) return "done";
+    if (diffDays <= 7) return "soon";
+    return "wait";
+  }
+  function startOfWeek(d) {
+    var x = toMidnight(d);
+    var day = x.getDay(); // 0=Sun
+    var mondayOffset = day === 0 ? -6 : 1 - day;
+    return addDays(x, mondayOffset);
+  }
+
+  document.querySelectorAll(".pb-filter-chip").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      pbCompanyFilter = btn.getAttribute("data-company");
+      document.querySelectorAll(".pb-filter-chip").forEach(function (b) {
+        var active = b === btn;
+        var company = b.getAttribute("data-company");
+        if (company === "all") { b.style.background = active ? "var(--pb-accent)" : "var(--pb-page)"; b.style.color = active ? "#fff" : "var(--pb-ink-2)"; }
+        else if (company === "GC케어") { b.style.background = "var(--care-wash)"; b.style.color = "var(--care)"; b.style.opacity = active ? "1" : ".55"; }
+        else { b.style.background = "var(--mzi-wash)"; b.style.color = "var(--mzi)"; b.style.opacity = active ? "1" : ".55"; }
+      });
+      renderProbation(pbLastRows);
+    });
+  });
+
+  document.querySelectorAll(".pb-subtab").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      pbSubtab = btn.getAttribute("data-subtab");
+      document.querySelectorAll(".pb-subtab").forEach(function (b) { b.classList.toggle("active", b === btn); });
+      document.getElementById("pbTimelineView").hidden = pbSubtab !== "timeline";
+      document.getElementById("pbTableView").hidden = pbSubtab !== "table";
+    });
+  });
+
+  [["pbTileInprogress", "inprogress", "pbInprogressPopup"], ["pbTilePending", "pending", "pbPendingPopup"],
+   ["pbTileDone", "done", "pbDonePopup"], ["pbTileExpire", "expire", "pbExpirePopup"]].forEach(function (spec) {
+    var trigger = document.getElementById(spec[0]);
+    if (!trigger) return;
+    trigger.addEventListener("click", function (e) {
+      if (e.target.closest(".pb-popup")) return;
+      pbOpenTile = pbOpenTile === spec[1] ? null : spec[1];
+      ["pbInprogressPopup", "pbPendingPopup", "pbDonePopup", "pbExpirePopup"].forEach(function (id) {
+        document.getElementById(id).hidden = id !== spec[2] || pbOpenTile === null;
+      });
+    });
+  });
+  document.addEventListener("click", function (e) {
+    if (!e.target.closest(".pb-tile")) {
+      pbOpenTile = null;
+      document.querySelectorAll(".pb-popup").forEach(function (p) { p.hidden = true; });
+    }
+  });
+
+  document.getElementById("pbRefreshBtn").addEventListener("click", load);
+
+  function popupRow(r, note, noteColor) {
+    var badgeClass = r.company === CARE ? "care-wash" : "mzi-wash";
+    var color = r.company === CARE ? CARE_HEX : MZI_HEX;
+    var wash = r.company === CARE ? "var(--care-wash)" : "var(--mzi-wash)";
+    return '<div class="pb-popup-row"><span class="pb-co-badge" style="background:' + wash + ';color:' + color + ';">' +
+      (r.company === CARE ? "케어" : "메디아이") + "</span>" + r.name +
+      '<span style="color:' + (noteColor || "var(--pb-ink-muted)") + ';font-size:12px;">' + note + "</span></div>";
+  }
+
+  function renderProbation(rows) {
+    pbLastRows = rows;
+    var today = toMidnight(new Date());
+    var withDates = rows.map(function (r) {
+      var hire = toMidnight(new Date(r.hire_date + "T00:00:00"));
+      return {
+        name: r.name,
+        company: r.company,
+        department: r.department,
+        employmentType: r.employment_type,
+        hire: hire,
+        mid: addDays(hire, 40),
+        final: addDays(hire, 70),
+        end: addDays(hire, 90)
+      };
+    }).filter(function (r) { return r.end >= today; })
+      .sort(function (a, b) { return a.hire - b.hire; });
+
+    var filtered = pbCompanyFilter === "all" ? withDates : withDates.filter(function (r) { return r.company === pbCompanyFilter; });
+
+    // ── 상단 타일 ──
+    document.getElementById("pbInprogressValue").innerHTML = filtered.length + '<span class="u">명</span>';
+    document.getElementById("pbInprogressPopupTitle").textContent = "진행중 인원 · " + filtered.length + "명";
+    document.getElementById("pbInprogressPopupBody").innerHTML = filtered.map(function (r) {
+      return popupRow(r, "종료 " + fmtMD(r.end));
+    }).join("") || '<div style="color:var(--pb-ink-muted);font-size:13px;">해당 인원 없음</div>';
+
+    var weekStart = startOfWeek(today);
+    var weekEnd = addDays(weekStart, 6);
+    var pending = [], done = [];
+    filtered.forEach(function (r) {
+      [["mid", r.mid, "중간"], ["final", r.final, "최종"]].forEach(function (spec) {
+        var d = spec[1];
+        if (d >= weekStart && d <= weekEnd) {
+          if (d < today) done.push({ r: r, label: spec[2], date: d });
+          else pending.push({ r: r, label: spec[2], date: d });
+        }
+      });
+    });
+    document.getElementById("pbPendingValue").textContent = pending.length + "명";
+    document.getElementById("pbPendingPopupTitle").textContent = "이번주 평가예정 · " + pending.length + "명";
+    document.getElementById("pbPendingPopupBody").innerHTML = pending.map(function (p) {
+      return popupRow(p.r, p.label + " " + fmtMD(p.date), "var(--pb-soon)");
+    }).join("") || '<div style="color:var(--pb-ink-muted);font-size:13px;">해당 인원 없음</div>';
+    document.getElementById("pbDoneValue").textContent = done.length + "명";
+    document.getElementById("pbDonePopupTitle").textContent = "이번주 평가완료 · " + done.length + "명";
+    document.getElementById("pbDonePopupBody").innerHTML = done.map(function (p) {
+      return popupRow(p.r, p.label + " " + fmtMD(p.date), "var(--pb-done)");
+    }).join("") || '<div style="color:var(--pb-ink-muted);font-size:13px;">해당 인원 없음</div>';
+
+    var year = today.getFullYear(), month = today.getMonth();
+    var expiring = filtered.filter(function (r) { return r.end.getFullYear() === year && r.end.getMonth() === month; });
+    document.getElementById("pbExpireValue").innerHTML = expiring.length + '<span class="u">명</span>';
+    document.getElementById("pbExpirePopupTitle").textContent = "이번달 수습만료 · " + expiring.length + "명";
+    document.getElementById("pbExpirePopupBody").innerHTML = expiring.map(function (r) {
+      return popupRow(r, "종료 " + fmtMD(r.end), pbStatus(r.end, today) === "soon" ? "var(--pb-soon)" : "var(--pb-ink-muted)");
+    }).join("") || '<div style="color:var(--pb-ink-muted);font-size:13px;">해당 인원 없음</div>';
+
+    // ── 타임라인 / 표 ──
+    if (filtered.length === 0) {
+      document.getElementById("pbRows").innerHTML = '<div class="state-card">현재 수습이 진행 중인 인원이 없습니다.</div>';
+      document.getElementById("pbMonthAxis").innerHTML = "";
+      document.getElementById("pbTodayRow").innerHTML = "";
+      document.getElementById("pbTableBody").innerHTML = "";
+      return;
+    }
+
+    var rangeStart = filtered[0].hire;
+    var rangeEnd = filtered.reduce(function (max, r) { return r.end > max ? r.end : max; }, filtered[0].end);
+    rangeEnd = addDays(rangeEnd, 5);
+    var rangeSpan = rangeEnd - rangeStart;
+    function pct(d) { return ((d - rangeStart) / rangeSpan) * 100; }
+
+    var monthAxisEl = document.getElementById("pbMonthAxis");
+    var monthsHtml = "";
+    var cursor = new Date(rangeStart.getFullYear(), rangeStart.getMonth(), 1);
+    while (cursor <= rangeEnd) {
+      var p = pct(cursor);
+      if (p >= -2 && p <= 102) {
+        monthsHtml += '<span style="left:' + Math.max(0, p) + '%;">' + (cursor.getMonth() + 1) + "월</span>";
+      }
+      cursor = new Date(cursor.getFullYear(), cursor.getMonth() + 1, 1);
+    }
+    monthAxisEl.innerHTML = monthsHtml;
+
+    var todayRowEl = document.getElementById("pbTodayRow");
+    if (today >= rangeStart && today <= rangeEnd) {
+      todayRowEl.innerHTML = '<span class="pb-today-label" style="left:' + pct(today) + '%;">▼ 오늘 ' + fmtMD(today) + "</span>";
+    } else {
+      todayRowEl.innerHTML = "";
+    }
+
+    var rowsHtml = "";
+    filtered.forEach(function (r) {
+      var startPct = pct(r.hire);
+      var elapsedEnd = today < r.end ? today : r.end;
+      var elapsedPct = pct(elapsedEnd) - startPct;
+      var totalPct = pct(r.end) - startPct;
+      var gridlines = "";
+      for (var g = 0; g <= 100; g += 10) gridlines += '<div class="pb-gline" style="left:' + g + '%;"></div>';
+
+      function marker(d, label) {
+        var st = pbStatus(d, today);
+        var cls = st === "done" ? "pb-m-done" : (st === "soon" ? "pb-m-soon" : "pb-m-wait");
+        var color = st === "done" ? "var(--pb-done)" : (st === "soon" ? "var(--pb-soon)" : "var(--pb-ink-muted)");
+        var inner = st === "done" ? '<span style="color:#fff;font-size:10px;font-weight:700;">✓</span>' : "";
+        return '<div class="' + cls + '" style="left:' + pct(d) + '%;">' + inner + "</div>" +
+          '<div class="pb-m-label" style="left:' + pct(d) + '%; transform:translateX(-50%); color:' + color + ';">' + label + " " + fmtMD(d) + "</div>";
+      }
+
+      var empClass = r.employmentType === "계약직" ? "contract" : "";
+      var coWash = r.company === CARE ? "var(--care-wash)" : "var(--mzi-wash)";
+      var coColor = r.company === CARE ? CARE_HEX : MZI_HEX;
+
+      rowsHtml += '<div class="pb-row">' +
+        '<div class="pb-row-label">' +
+          '<div style="display:flex;align-items:center;gap:8px;"><span style="font-size:15px;font-weight:600;width:58px;display:inline-block;flex-shrink:0;">' + r.name + '</span>' +
+          '<span class="pb-co-badge" style="background:' + coWash + ';color:' + coColor + ';">' + r.company + '</span></div>' +
+          '<div style="display:flex;align-items:center;gap:6px;"><span style="font-size:12px;color:var(--pb-ink-muted);width:58px;display:inline-block;flex-shrink:0;">' + (r.department || "") + '</span>' +
+          '<span class="pb-emp-badge ' + empClass + '">' + r.employmentType + '</span></div>' +
+        '</div>' +
+        '<div class="pb-row-track">' + gridlines +
+          '<div style="position:absolute;top:13px;height:8px;left:' + startPct + '%;width:' + totalPct + '%;border-radius:999px;background:#f3e6d1;"></div>' +
+          '<div style="position:absolute;top:13px;height:8px;left:' + startPct + '%;width:' + elapsedPct + '%;border-radius:999px;background:var(--pb-accent);"></div>' +
+          '<div class="pb-m-label" style="left:' + startPct + '%; color:var(--pb-ink-muted);">입사 ' + fmtMD(r.hire) + '</div>' +
+          marker(r.mid, "중간") + marker(r.final, "최종") + marker(r.end, "종료") +
+        '</div>' +
+      '</div>';
+    });
+    document.getElementById("pbRows").innerHTML = rowsHtml;
+
+    var tbodyHtml = "";
+    filtered.forEach(function (r) {
+      function cell(d) {
+        var st = pbStatus(d, today);
+        var cls = st === "done" ? "pb-st-done" : (st === "soon" ? "pb-st-soon" : "pb-st-wait");
+        var inner = st === "done" ? "✓" : "";
+        return '<td><div class="pb-st-cell"><span class="' + cls + '">' + inner + "</span>" + fmtYMD(d) + "</div></td>";
+      }
+      var coWash = r.company === CARE ? "var(--care-wash)" : "var(--mzi-wash)";
+      var coColor = r.company === CARE ? CARE_HEX : MZI_HEX;
+      tbodyHtml += "<tr><td>" + r.name + "</td>" +
+        '<td><span class="pb-co-badge" style="background:' + coWash + ';color:' + coColor + ';">' + r.company + "</span></td>" +
+        "<td>" + (r.department || "") + "</td>" +
+        "<td>" + r.employmentType + "</td>" +
+        "<td>" + fmtYMD(r.hire) + "</td>" +
+        cell(r.mid) + cell(r.final) + cell(r.end) +
+        "</tr>";
+    });
+    document.getElementById("pbTableBody").innerHTML = tbodyHtml;
+  }
 
   load();
 })();
