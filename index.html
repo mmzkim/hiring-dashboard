@@ -800,10 +800,18 @@ grant select on public.hire_stats to anon;</pre>
       </div>
     </div>
 
-    <div class="pb-filters">
-      <button type="button" class="pb-filter-chip active" data-company="all" style="background:var(--pb-accent); color:#fff;">전체</button>
-      <button type="button" class="pb-filter-chip" data-company="GC케어" style="background:var(--care-wash); color:var(--care);">GC케어</button>
-      <button type="button" class="pb-filter-chip" data-company="GC메디아이" style="background:var(--mzi-wash); color:var(--mzi);">GC메디아이</button>
+    <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px;">
+      <div class="pb-filters">
+        <button type="button" class="pb-filter-chip active" data-company="all" style="background:var(--pb-accent); color:#fff;">전체</button>
+        <button type="button" class="pb-filter-chip" data-company="GC케어" style="background:var(--care-wash); color:var(--care);">GC케어</button>
+        <button type="button" class="pb-filter-chip" data-company="GC메디아이" style="background:var(--mzi-wash); color:var(--mzi);">GC메디아이</button>
+      </div>
+      <div class="pb-legend">
+        <span class="pb-legend-item"><span class="pb-st-done">✓</span>완료</span>
+        <span class="pb-legend-item"><span class="pb-st-soon"></span>임박 (D-7 이내)</span>
+        <span class="pb-legend-item"><span class="pb-st-wait"></span>예정</span>
+        <span class="pb-legend-item"><span style="width:14px;height:8px;border-radius:999px;background:var(--pb-accent);display:inline-block;"></span>경과 기간</span>
+      </div>
     </div>
 
     <div class="pb-panel" id="pbUpcomingPanel" hidden>
@@ -1330,6 +1338,88 @@ grant select on public.hire_stats to anon;</pre>
       '<span class="pb-note" style="color:' + (noteColor || "var(--pb-ink-muted)") + ';">' + note + '</span></div>';
   }
 
+  function renderPbTimelineGroup(prefix, list) {
+    var panelEl = document.getElementById(prefix + "Panel");
+    var countEl = document.getElementById(prefix + "Count");
+    var bodyEl = document.getElementById(prefix + "Body");
+    if (!panelEl) return;
+    panelEl.hidden = list.length === 0;
+    countEl.textContent = list.length;
+    bodyEl.style.padding = "0";
+    if (list.length === 0) { bodyEl.innerHTML = ""; return; }
+
+    var today = toMidnight(new Date());
+    var rangeStart = list.reduce(function (min, r) { return r.hire < min ? r.hire : min; }, list[0].hire);
+    var rangeEnd = list.reduce(function (max, r) { return r.end > max ? r.end : max; }, list[0].end);
+    rangeEnd = addDays(rangeEnd, 5);
+    var rangeSpan = rangeEnd - rangeStart;
+    function pct(d) { return ((d - rangeStart) / rangeSpan) * 100; }
+
+    var monthsHtml = "";
+    var cursor = new Date(rangeStart.getFullYear(), rangeStart.getMonth(), 1);
+    while (cursor <= rangeEnd) {
+      var p = pct(cursor);
+      if (p >= -2 && p <= 102) {
+        monthsHtml += '<span style="left:' + Math.max(0, p) + '%;">' + (cursor.getMonth() + 1) + "월</span>";
+      }
+      cursor = new Date(cursor.getFullYear(), cursor.getMonth() + 1, 1);
+    }
+
+    var todayHtml = "";
+    if (today >= rangeStart && today <= rangeEnd) {
+      todayHtml = '<span class="pb-today-label" style="left:' + pct(today) + '%;">▼ 오늘 ' + fmtMD(today) + "</span>";
+    }
+
+    var rowsHtml = "";
+    list.forEach(function (r) {
+      var startPct = pct(r.hire);
+      var elapsedEnd = today < r.end ? today : r.end;
+      var elapsedPct = pct(elapsedEnd) - startPct;
+      var totalPct = pct(r.end) - startPct;
+      var gridlines = "";
+      for (var g = 0; g <= 100; g += 10) gridlines += '<div class="pb-gline" style="left:' + g + '%;"></div>';
+
+      function marker(d, label) {
+        var st = pbStatus(d, today);
+        var cls = st === "done" ? "pb-m-done" : (st === "soon" ? "pb-m-soon" : "pb-m-wait");
+        var color = st === "done" ? "var(--pb-done)" : (st === "soon" ? "var(--pb-soon)" : "var(--pb-ink-muted)");
+        var inner = st === "done" ? '<span style="color:#fff;font-size:10px;font-weight:700;">✓</span>' : "";
+        return '<div class="' + cls + '" style="left:' + pct(d) + '%;">' + inner + "</div>" +
+          '<div class="pb-m-label" style="left:' + pct(d) + '%; transform:translateX(-50%); color:' + color + ';">' + label + " " + fmtMD(d) + "</div>";
+      }
+
+      var empClass = r.employmentType === "계약직" ? "contract" : "";
+      var coWash = r.company === CARE ? "var(--care-wash)" : "var(--mzi-wash)";
+      var coColor = r.company === CARE ? CARE_HEX : MZI_HEX;
+
+      rowsHtml += '<div class="pb-row">' +
+        '<div class="pb-row-label">' +
+          '<div style="display:flex;align-items:center;gap:8px;"><span style="font-size:15px;font-weight:600;">' + r.name + '</span>' +
+          '<span class="pb-co-badge" style="background:' + coWash + ';color:' + coColor + ';">' + r.company + '</span></div>' +
+          '<div style="display:flex;align-items:center;gap:6px;"><span style="font-size:12px;color:var(--pb-ink-muted);">' + (r.department || "") + '</span>' +
+          '<span class="pb-emp-badge ' + empClass + '">' + (r.employmentType || "-") + '</span></div>' +
+        '</div>' +
+        '<div class="pb-row-track">' + gridlines +
+          '<div style="position:absolute;top:13px;height:8px;left:' + startPct + '%;width:' + totalPct + '%;border-radius:999px;background:#f3e6d1;"></div>' +
+          '<div style="position:absolute;top:13px;height:8px;left:' + startPct + '%;width:' + elapsedPct + '%;border-radius:999px;background:var(--pb-accent);"></div>' +
+          '<div class="pb-m-label" style="left:' + startPct + '%; color:var(--pb-ink-muted);">입사 ' + fmtMD(r.hire) + '</div>' +
+          marker(r.mid, "중간") + marker(r.final, "최종") + marker(r.end, "종료") +
+        '</div>' +
+      '</div>';
+    });
+
+    bodyEl.innerHTML =
+      '<div style="display:flex; padding:14px 20px 0 20px;">' +
+        '<div style="width:220px; flex-shrink:0;"></div>' +
+        '<div class="pb-axis-months" style="height:14px;">' + todayHtml + '</div>' +
+      '</div>' +
+      '<div style="display:flex; padding:2px 20px 10px 20px; border-bottom:1px solid var(--pb-border);">' +
+        '<div style="width:220px; flex-shrink:0;"></div>' +
+        '<div class="pb-axis-months">' + monthsHtml + '</div>' +
+      '</div>' +
+      '<div>' + rowsHtml + '</div>';
+  }
+
   function renderPbGroup(prefix, list, noteFn, noteColorFn, splitByCompany) {
     var panelEl = document.getElementById(prefix + "Panel");
     var countEl = document.getElementById(prefix + "Count");
@@ -1439,13 +1529,9 @@ grant select on public.hire_stats to anon;</pre>
     var expiringSoon = filtered.filter(function (r) { return today >= r.final; })
       .sort(function (a, b) { return a.end - b.end; });
 
-    function noteColorFor(dateKey) {
-      return function (r) { return pbStatus(r[dateKey], today) === "soon" ? "var(--pb-soon)" : "var(--pb-ink-muted)"; };
-    }
-
-    renderPbGroup("pbMid", midPending, function (r) { return "중간평가 " + fmtMD(r.mid); }, noteColorFor("mid"));
-    renderPbGroup("pbFinal", finalPending, function (r) { return "최종평가 " + fmtMD(r.final); }, noteColorFor("final"));
-    renderPbGroup("pbExpiring", expiringSoon, function (r) { return "종료 " + fmtMD(r.end); }, noteColorFor("end"));
+    renderPbTimelineGroup("pbMid", midPending);
+    renderPbTimelineGroup("pbFinal", finalPending);
+    renderPbTimelineGroup("pbExpiring", expiringSoon);
   }
 
   load();
