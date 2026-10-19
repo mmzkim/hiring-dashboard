@@ -434,8 +434,8 @@
   table.datatable th:last-child, table.datatable td:last-child { border-right: none; }
   table.datatable thead th {
     color: var(--ink-muted);
-    font-weight: 600;
-    font-size: 12.5px;
+    font-weight: 700;
+    font-size: 16px;
     text-transform: uppercase;
     letter-spacing: .03em;
     border-bottom: 1px solid var(--border);
@@ -455,6 +455,57 @@
     margin-top: 4px;
     font-variant-numeric: tabular-nums;
   }
+  /* 회사별 열 구분 */
+  table.datatable thead th.col-care { color: var(--care); background: var(--care-wash); }
+  table.datatable thead th.col-mzi { color: var(--mzi); background: var(--mzi-wash); }
+  table.datatable tbody td.col-care { background: rgba(47,111,237,.06); }
+  table.datatable tbody td.col-mzi { background: rgba(255,122,69,.07); }
+  table.datatable tbody tr:nth-child(odd) td.col-care { background: rgba(47,111,237,.10); }
+  table.datatable tbody tr:nth-child(odd) td.col-mzi { background: rgba(255,122,69,.11); }
+  table.datatable td.clickable { cursor: pointer; }
+  table.datatable td.clickable:hover .count-main,
+  table.datatable td.clickable:hover .total-main { text-decoration: underline; text-underline-offset: 4px; }
+
+  /* 입사자 상세 팝업 */
+  .dl-backdrop {
+    position: fixed; inset: 0;
+    background: rgba(16,24,40,.38);
+    display: flex; align-items: center; justify-content: center;
+    padding: 16px;
+    z-index: 50;
+  }
+  .dl-modal {
+    background: var(--card);
+    border-radius: 14px;
+    box-shadow: 0 16px 40px rgba(16,24,40,.22);
+    width: 100%; max-width: 680px;
+    max-height: calc(100vh - 32px);
+    display: flex; flex-direction: column;
+    overflow: hidden;
+  }
+  .dl-head {
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+  .dl-head h3 { margin: 0; font-size: 16px; font-weight: 700; }
+  .dl-actions { display: flex; gap: 6px; }
+  .dl-body { padding: 14px 20px 20px; overflow: auto; user-select: text; }
+  .dl-group + .dl-group { margin-top: 18px; }
+  .dl-group-title { font-size: 13.5px; font-weight: 700; margin: 0 0 8px; color: var(--ink-2); }
+  .dl-group-title .n { color: var(--ink); }
+  table.dl-tbl { border-collapse: collapse; width: 100%; font-size: 13.5px; table-layout: fixed; }
+  table.dl-tbl th, table.dl-tbl td {
+    border: 1px solid var(--border);
+    padding: 8px 10px;
+    text-align: center;
+    word-break: keep-all;
+  }
+  table.dl-tbl th { background: var(--page); color: var(--ink-2); font-weight: 600; font-size: 12.5px; }
+  table.dl-tbl tr.co-care td:first-child { color: var(--care); font-weight: 600; }
+  table.dl-tbl tr.co-mzi td:first-child { color: var(--mzi); font-weight: 600; }
+  .dl-empty { font-size: 13px; color: var(--ink-muted); padding: 6px 0; }
+  .dl-copied { font-size: 12px; color: var(--teal); font-weight: 600; align-self: center; }
 
   .state-card {
     text-align: center;
@@ -884,6 +935,20 @@ grant select on public.hire_stats to anon;</pre>
 
 <div id="tooltip"></div>
 
+<div class="dl-backdrop" id="detailModal" hidden>
+  <div class="dl-modal" role="dialog" aria-modal="true" aria-labelledby="detailTitle">
+    <div class="dl-head">
+      <h3 id="detailTitle">입사자 상세</h3>
+      <div class="dl-actions">
+        <span class="dl-copied" id="detailCopied" hidden>복사됨</span>
+        <button type="button" class="iconbtn" id="detailCopyBtn">복사</button>
+        <button type="button" class="iconbtn" id="detailCloseBtn" aria-label="닫기">닫기</button>
+      </div>
+    </div>
+    <div class="dl-body" id="detailBody"></div>
+  </div>
+</div>
+
 <script>
 (function () {
   var SUPABASE_URL = "https://kubcwywqxvwgoxtnciyz.supabase.co";
@@ -1016,6 +1081,8 @@ grant select on public.hire_stats to anon;</pre>
         mzi: mziRows.length,
         careType: typeBreak(careRows),
         mziType: typeBreak(mziRows),
+        careRows: careRows,
+        mziRows: mziRows,
         total: careRows.length + mziRows.length,
         partial: m === curMonth
       };
@@ -1228,17 +1295,24 @@ grant select on public.hire_stats to anon;</pre>
     tooltipEl.classList.add("show");
   }
 
+  var tableMonths = [];
+
   function buildTable(byMonth, upcomingCount) {
+    tableMonths = byMonth;
     var t = document.getElementById("dataTable");
-    var html = '<thead><tr><th>월</th><th>GC케어</th><th>GC메디아이</th><th>합계</th></tr></thead><tbody>';
-    byMonth.forEach(function (item) {
+    var html = '<thead><tr><th>월</th><th class="col-care">GC케어</th><th class="col-mzi">GC메디아이</th><th>합계</th></tr></thead><tbody>';
+    byMonth.forEach(function (item, i) {
+      function cell(which, hex, n, type) {
+        return '<td class="col-' + which + (n > 0 ? ' clickable" data-idx="' + i + '" data-co="' + which + '" title="클릭하여 상세 보기"' : '"') + '>' +
+          '<div class="count-main"><span class="swatch" style="background:' + hex + '"></span>' + n + '명</div>' +
+          '<div class="type-break">정규직 ' + type.regular + '명 · 계약직 ' + type.contract + '명</div></td>';
+      }
       html += "<tr>" +
         '<td class="month-cell">' + item.m + "월" + (item.partial ? " (진행중)" : "") + "</td>" +
-        '<td><div class="count-main"><span class="swatch" style="background:' + CARE_HEX + '"></span>' + item.care + '</div>' +
-        '<div class="type-break">정규직 ' + item.careType.regular + ' · 계약직 ' + item.careType.contract + '</div></td>' +
-        '<td><div class="count-main"><span class="swatch" style="background:' + MZI_HEX + '"></span>' + item.mzi + '</div>' +
-        '<div class="type-break">정규직 ' + item.mziType.regular + ' · 계약직 ' + item.mziType.contract + '</div></td>' +
-        "<td>" + item.total + "</td>" +
+        cell("care", CARE_HEX, item.care, item.careType) +
+        cell("mzi", MZI_HEX, item.mzi, item.mziType) +
+        '<td' + (item.total > 0 ? ' class="clickable" data-idx="' + i + '" data-co="all" title="클릭하여 상세 보기"' : '') + '>' +
+        '<span class="total-main">' + item.total + '명</span></td>' +
         "</tr>";
     });
     html += "</tbody>";
@@ -1246,6 +1320,100 @@ grant select on public.hire_stats to anon;</pre>
     var fn = document.getElementById("tableFootnote");
     fn.textContent = upcomingCount > 0 ? ("※ 예정된 입사 " + upcomingCount + "명은 위 표에 포함되지 않았습니다.") : "";
   }
+
+  // ── 월별 상세 표: 입사자 수 클릭 시 상세 팝업 ─────────────────────
+  var detailModalEl = document.getElementById("detailModal");
+  var detailTitleEl = document.getElementById("detailTitle");
+  var detailBodyEl = document.getElementById("detailBody");
+  var detailCopiedEl = document.getElementById("detailCopied");
+  var detailGroups = [];
+  var DETAIL_COLS = ["회사명", "부서명", "입사일", "이름", "고용형태"];
+
+  function escHtml(s) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+  function detailCells(r) {
+    return [r.company, r.department || "-", r.hire_date, r.name, r.employment_type || "-"];
+  }
+
+  function openDetail(idx, co) {
+    var item = tableMonths[idx];
+    if (!item) return;
+    var rows = co === "care" ? item.careRows : co === "mzi" ? item.mziRows : item.careRows.concat(item.mziRows);
+    rows = rows.slice().sort(function (a, b) {
+      return (a.company === b.company ? 0 : a.company === CARE ? -1 : 1) ||
+        a.hire_date.localeCompare(b.hire_date) ||
+        String(a.department || "").localeCompare(String(b.department || "")) ||
+        String(a.name).localeCompare(String(b.name));
+    });
+    var coLabel = co === "care" ? CARE : co === "mzi" ? MZI : "전체";
+    detailTitleEl.textContent = item.m + "월 입사자 · " + coLabel + " " + rows.length + "명";
+
+    var regular = rows.filter(function (r) { return r.employment_type === "정규직"; });
+    var contract = rows.filter(function (r) { return r.employment_type === "계약직"; });
+    var other = rows.filter(function (r) { return r.employment_type !== "정규직" && r.employment_type !== "계약직"; });
+    detailGroups = [["정규직", regular], ["계약직", contract]];
+    if (other.length) detailGroups.push(["고용형태 미입력", other]);
+
+    detailBodyEl.innerHTML = detailGroups.map(function (g) {
+      var head = '<div class="dl-group-title">' + g[0] + ' <span class="n">' + g[1].length + '명</span></div>';
+      if (!g[1].length) return '<div class="dl-group">' + head + '<div class="dl-empty">해당 인원 없음</div></div>';
+      return '<div class="dl-group">' + head +
+        '<table class="dl-tbl"><thead><tr>' + DETAIL_COLS.map(function (c) { return "<th>" + c + "</th>"; }).join("") + '</tr></thead><tbody>' +
+        g[1].map(function (r) {
+          return '<tr class="' + (r.company === CARE ? "co-care" : "co-mzi") + '">' +
+            detailCells(r).map(function (v) { return "<td>" + escHtml(v) + "</td>"; }).join("") + "</tr>";
+        }).join("") +
+        "</tbody></table></div>";
+    }).join("");
+
+    detailCopiedEl.hidden = true;
+    detailModalEl.hidden = false;
+  }
+
+  function closeDetail() { detailModalEl.hidden = true; }
+
+  function detailTsv() {
+    var lines = [["구분"].concat(DETAIL_COLS).join("\t")];
+    detailGroups.forEach(function (g) {
+      g[1].forEach(function (r) { lines.push([g[0]].concat(detailCells(r)).join("\t")); });
+    });
+    return lines.join("\n");
+  }
+
+  function copyText(text) {
+    if (navigator.clipboard && window.isSecureContext) return navigator.clipboard.writeText(text);
+    return new Promise(function (resolve, reject) {
+      var ta = document.createElement("textarea");
+      ta.value = text;
+      ta.style.position = "fixed"; ta.style.opacity = "0";
+      document.body.appendChild(ta);
+      ta.select();
+      var ok = document.execCommand("copy");
+      document.body.removeChild(ta);
+      ok ? resolve() : reject(new Error("copy failed"));
+    });
+  }
+
+  document.getElementById("dataTable").addEventListener("click", function (e) {
+    var td = e.target.closest("td.clickable");
+    if (!td) return;
+    openDetail(Number(td.getAttribute("data-idx")), td.getAttribute("data-co"));
+  });
+  document.getElementById("detailCloseBtn").addEventListener("click", closeDetail);
+  detailModalEl.addEventListener("click", function (e) { if (e.target === detailModalEl) closeDetail(); });
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape" && !detailModalEl.hidden) closeDetail(); });
+  document.getElementById("detailCopyBtn").addEventListener("click", function () {
+    copyText(detailTsv()).then(function () {
+      detailCopiedEl.textContent = "복사됨";
+      detailCopiedEl.hidden = false;
+    }, function () {
+      detailCopiedEl.textContent = "복사 실패 (드래그해서 복사해주세요)";
+      detailCopiedEl.hidden = false;
+    });
+  });
 
   document.getElementById("refreshBtn").addEventListener("click", load);
   document.getElementById("retryBtn").addEventListener("click", load);
