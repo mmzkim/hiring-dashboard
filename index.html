@@ -10,7 +10,7 @@
 <style>
   :root {
     color-scheme: light;
-    --page:         #f3f5f9;
+    --page:         #f5f6f8;
     --card:         #ffffff;
     --border:       #e7e9ef;
     --ink:          #16181d;
@@ -20,26 +20,26 @@
     --baseline:     #d6d9e0;
     --shadow:       0 1px 2px rgba(16,24,40,.04), 0 2px 8px rgba(16,24,40,.05);
 
-    --care:         #2f6fed;   /* GC케어 */
-    --care-wash:    #e9f0ff;
-    --mzi:          #ff7a45;   /* GC메디아이 */
-    --mzi-wash:     #fff0e8;
-    --teal:         #0fb5a3;
-    --teal-wash:    #e3faf6;
-    --violet:       #7c5cfc;
-    --violet-wash:  #f0ecff;
+    --care:         #1f2a6e;   /* GC케어 (네이비) */
+    --care-wash:    #e8eaf4;
+    --mzi:          #1fa37e;   /* GC메디아이 (민트) */
+    --mzi-wash:     #e2f6ef;
+    --teal:         #4a8fa3;
+    --teal-wash:    #e4f0f3;
+    --violet:       #2d5b8a;
+    --violet-wash:  #e5ecf4;
 
-    /* 수습현황 보드 전용 (은은한 앰버 톤) */
-    --pb-page:      #faf6f0;
+    /* 수습현황 보드 전용 (입사현황과 같은 네이비·민트 톤) */
+    --pb-page:      #f5f6f8;
     --pb-card:      #ffffff;
-    --pb-border:    #ece2d3;
-    --pb-ink:       #211d18;
-    --pb-ink-2:     #6b6156;
-    --pb-ink-muted: #a89d8d;
-    --pb-accent:    #c98a46;
-    --pb-done:      #3f7a4a;
+    --pb-border:    #e7e9ef;
+    --pb-ink:       #16181d;
+    --pb-ink-2:     #5b6472;
+    --pb-ink-muted: #8891a0;
+    --pb-accent:    #1f2a6e;
+    --pb-done:      #1f9e7c;
     --pb-soon:      #c9722c;
-    --pb-wait:      #b9ac96;
+    --pb-wait:      #b8bfcc;
   }
 
   * { box-sizing: border-box; }
@@ -116,8 +116,7 @@
   .nav-item svg { flex: none; }
   .nav-item:hover { background: var(--page); color: var(--ink); }
   .nav-item.active { background: var(--care-wash); color: var(--care); font-weight: 700; }
-  .nav-item[data-page="probation"].active { background: #f6ecdf; color: var(--pb-accent); }
-  .sidebar.collapsed { width: 68px; }
+    .sidebar.collapsed { width: 68px; }
   .sidebar.collapsed .brand,
   .sidebar.collapsed .nav-label { display: none; }
   .sidebar.collapsed .sidebar-head { justify-content: center; padding-inline: 0; }
@@ -530,10 +529,10 @@
   /* 회사별 열 구분 */
   table.datatable thead th.col-care { color: var(--care); background: var(--care-wash); }
   table.datatable thead th.col-mzi { color: var(--mzi); background: var(--mzi-wash); }
-  table.datatable tbody td.col-care { background: rgba(47,111,237,.06); }
-  table.datatable tbody td.col-mzi { background: rgba(255,122,69,.07); }
-  table.datatable tbody tr:nth-child(odd) td.col-care { background: rgba(47,111,237,.10); }
-  table.datatable tbody tr:nth-child(odd) td.col-mzi { background: rgba(255,122,69,.11); }
+  table.datatable tbody td.col-care { background: rgba(31,42,110,.05); }
+  table.datatable tbody td.col-mzi { background: rgba(47,185,143,.07); }
+  table.datatable tbody tr:nth-child(odd) td.col-care { background: rgba(31,42,110,.08); }
+  table.datatable tbody tr:nth-child(odd) td.col-mzi { background: rgba(47,185,143,.11); }
   table.datatable td.clickable { cursor: pointer; }
   table.datatable td.clickable:hover .count-main,
   table.datatable td.clickable:hover .total-main { text-decoration: underline; text-underline-offset: 4px; }
@@ -643,7 +642,7 @@
     background: var(--pb-card);
     border: 1px solid var(--pb-border);
     border-radius: 12px;
-    box-shadow: 0 10px 28px rgba(33,29,24,0.16);
+    box-shadow: 0 10px 28px rgba(16,24,40,0.16);
     padding: 14px 16px;
     z-index: 30;
     cursor: default;
@@ -697,14 +696,14 @@
   .pb-group-body { padding: 4px 20px 16px 20px; display: flex; flex-direction: column; gap: 8px; border-top: 1px solid var(--pb-border); }
 
   .pb-co-badge { display: inline-block; padding: 2px 9px; border-radius: 999px; font-size: 11px; font-weight: 600; white-space: nowrap; text-align: center; }
-  .pb-emp-badge { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 600; background: #f2efe9; color: var(--pb-ink-2); }
-  .pb-emp-badge.contract { background: #faf0de; color: #b8763a; }
+  .pb-emp-badge { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 600; background: #eef0f4; color: var(--pb-ink-2); }
+  .pb-emp-badge.contract { background: #e2f6ef; color: #1f8a6a; }
 
   .pb-row { display: flex; align-items: flex-start; gap: 20px; padding: 14px 20px; border-bottom: 1px solid var(--pb-border); }
   .pb-row:last-child { border-bottom: none; }
   .pb-row-label { width: 220px; flex-shrink: 0; display: flex; flex-direction: column; gap: 4px; }
   .pb-row-track { flex-grow: 1; position: relative; height: 44px; }
-  .pb-gline { position: absolute; top: 0; height: 44px; width: 1px; background: #efe6d6; }
+  .pb-gline { position: absolute; top: 0; height: 44px; width: 1px; background: #edeef2; }
   .pb-m-done { position: absolute; border-radius: 50%; background: var(--pb-done); box-shadow: 0 0 0 2px var(--pb-card); display: flex; align-items: center; justify-content: center; z-index: 2; top: 9px; width: 16px; height: 16px; transform: translate(-50%,0); }
   .pb-m-soon { position: absolute; background: var(--pb-soon); box-shadow: 0 0 0 2px var(--pb-card); z-index: 2; top: 10px; width: 13px; height: 13px; transform: translate(-50%,0) rotate(45deg); }
   .pb-m-wait { position: absolute; border-radius: 50%; background: var(--pb-card); border: 2px solid var(--pb-wait); box-sizing: border-box; z-index: 2; top: 9px; width: 16px; height: 16px; transform: translate(-50%,0); }
@@ -716,7 +715,7 @@
 
   table.pb-tbl { border-collapse: separate; border-spacing: 0; width: 100%; }
   table.pb-tbl th, table.pb-tbl td { padding: 13px 10px; text-align: center; border-bottom: 1px solid var(--pb-border); font-size: 13.5px; white-space: nowrap; }
-  table.pb-tbl thead th { font-size: 12px; font-weight: 600; color: var(--pb-ink-2); background: #f7f1e7; }
+  table.pb-tbl thead th { font-size: 12px; font-weight: 600; color: var(--pb-ink-2); background: #f5f6f8; }
   table.pb-tbl tbody tr:last-child td { border-bottom: none; }
   .pb-st-cell { display: flex; align-items: center; justify-content: center; gap: 6px; }
   .pb-st-done { display: inline-flex; align-items: center; justify-content: center; width: 14px; height: 14px; border-radius: 50%; background: var(--pb-done); color: #fff; font-size: 9px; font-weight: 700; flex-shrink: 0; }
@@ -908,9 +907,9 @@ grant select on public.hire_stats to anon;</pre>
       </div>
 
       <div class="pb-tile" style="cursor:default;">
-        <div class="pb-tile-title"><span class="pb-dot" style="background:#d9a441;"></span>이번주 요약</div>
+        <div class="pb-tile-title"><span class="pb-dot" style="background:#4a8fa3;"></span>이번주 요약</div>
         <div class="pb-tile-row" id="pbTilePending">
-          <div class="pb-tile-sub-label"><span class="pb-dot" style="width:6px;height:6px;background:#d9a441;"></span>평가예정 인원</div>
+          <div class="pb-tile-sub-label"><span class="pb-dot" style="width:6px;height:6px;background:#4a8fa3;"></span>평가예정 인원</div>
           <div class="pb-tile-sub-value" id="pbPendingValue">–</div>
         </div>
         <div class="pb-popup" id="pbPendingPopup" hidden>
@@ -928,7 +927,7 @@ grant select on public.hire_stats to anon;</pre>
         </div>
         <div class="pb-tile-divider"></div>
         <div class="pb-tile-row" id="pbTileWeekEnd">
-          <div class="pb-tile-sub-label"><span class="pb-dot" style="width:6px;height:6px;background:#a9835a;"></span>수습종료 인원</div>
+          <div class="pb-tile-sub-label"><span class="pb-dot" style="width:6px;height:6px;background:#2d5b8a;"></span>수습종료 인원</div>
           <div class="pb-tile-sub-value" id="pbWeekEndValue">–</div>
         </div>
         <div class="pb-popup" id="pbWeekEndPopup" hidden>
@@ -938,7 +937,7 @@ grant select on public.hire_stats to anon;</pre>
       </div>
 
       <div class="pb-tile" id="pbTileExpire">
-        <div class="pb-tile-title"><span class="pb-dot" style="background:#a9835a;"></span>이번달 수습만료</div>
+        <div class="pb-tile-title"><span class="pb-dot" style="background:#2d5b8a;"></span>이번달 수습만료</div>
         <div class="pb-tile-value" id="pbExpireValue">–</div>
         <div class="pb-popup" id="pbExpirePopup" hidden style="left:auto; right:0;">
           <div class="pb-popup-title" id="pbExpirePopupTitle">이번달 수습만료</div>
@@ -1036,8 +1035,8 @@ grant select on public.hire_stats to anon;</pre>
   var CARE = "GC케어";
   var MZI = "GC메디아이";
   var pbSubtab = "timeline";
-  var CARE_HEX = "#2f6fed";
-  var MZI_HEX = "#ff7a45";
+  var CARE_HEX = "#1f2a6e";
+  var MZI_HEX = "#1fa37e";
 
   var loadingEl = document.getElementById("loadingState");
   var errorEl = document.getElementById("errorState");
@@ -1708,7 +1707,7 @@ grant select on public.hire_stats to anon;</pre>
           '<span class="pb-emp-badge ' + empClass + '">' + (r.employmentType || "-") + '</span></div>' +
         '</div>' +
         '<div class="pb-row-track">' + gridlines +
-          '<div style="position:absolute;top:13px;height:8px;left:' + startPct + '%;width:' + totalPct + '%;border-radius:999px;background:#f3e6d1;"></div>' +
+          '<div style="position:absolute;top:13px;height:8px;left:' + startPct + '%;width:' + totalPct + '%;border-radius:999px;background:#e3e6ef;"></div>' +
           '<div style="position:absolute;top:13px;height:8px;left:' + startPct + '%;width:' + elapsedPct + '%;border-radius:999px;background:var(--pb-accent);"></div>' +
           '<div class="pb-m-label" style="left:' + startPct + '%; color:var(--pb-ink-muted);">입사 ' + fmtMD(r.hire) + '</div>' +
           marker(r.mid, "중간") + marker(r.final, "최종") + marker(r.end, "종료") +
