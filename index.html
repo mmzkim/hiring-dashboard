@@ -48,7 +48,84 @@
     background: var(--page);
     color: var(--ink);
     font-family: "Pretendard", "Noto Sans KR", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Malgun Gothic", sans-serif;
-    padding-inline: 16px;
+  }
+
+  /* ── 앱 레이아웃: 좌측 사이드바 + 본문 ───────────────────────────── */
+  .app { display: flex; min-height: 100vh; }
+  .sidebar {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    width: 216px;
+    flex: none;
+    background: var(--card);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    padding: 18px 12px;
+    gap: 6px;
+    transition: width .18s ease;
+    z-index: 5;
+  }
+  .sidebar-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 4px 6px 18px;
+  }
+  .brand {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+    white-space: nowrap;
+  }
+  .brand-name { font-size: 17px; font-weight: 800; letter-spacing: -0.02em; color: var(--ink); }
+  .brand-sub { font-size: 11px; font-weight: 600; letter-spacing: .06em; color: var(--ink-muted); }
+  .collapse-btn {
+    width: 30px; height: 30px;
+    flex: none;
+    display: inline-flex; align-items: center; justify-content: center;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--card);
+    color: var(--ink-2);
+    cursor: pointer;
+  }
+  .collapse-btn:hover { color: var(--ink); border-color: #c9cedb; }
+  .collapse-btn:focus-visible, .nav-item:focus-visible { outline: 2px solid var(--care); outline-offset: 2px; }
+  .collapse-btn svg { transition: transform .18s ease; }
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 10px 12px;
+    border: none;
+    border-radius: 10px;
+    background: transparent;
+    color: var(--ink-2);
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 500;
+    text-align: left;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .nav-item svg { flex: none; }
+  .nav-item:hover { background: var(--page); color: var(--ink); }
+  .nav-item.active { background: var(--care-wash); color: var(--care); font-weight: 700; }
+  .nav-item[data-page="probation"].active { background: #f6ecdf; color: var(--pb-accent); }
+  .sidebar.collapsed { width: 68px; }
+  .sidebar.collapsed .brand,
+  .sidebar.collapsed .nav-label { display: none; }
+  .sidebar.collapsed .sidebar-head { justify-content: center; padding-inline: 0; }
+  .sidebar.collapsed .nav-item { justify-content: center; padding-inline: 0; }
+  .sidebar.collapsed .collapse-btn svg { transform: rotate(180deg); }
+  .main { flex: 1; min-width: 0; padding-inline: 24px; }
+  @media (max-width: 640px) {
+    .main { padding-inline: 16px; }
   }
   img { max-width: 100%; }
   [hidden] { display: none !important; }
@@ -158,21 +235,6 @@
   button.iconbtn:hover { color: var(--ink); border-color: #c9cedb; }
   button.iconbtn:focus-visible { outline: 2px solid var(--care); outline-offset: 2px; }
 
-  .page-pills { display: flex; gap: 6px; }
-  .page-pill {
-    border: none;
-    border-radius: 999px;
-    padding: 7px 15px;
-    font-size: 13px;
-    font-weight: 600;
-    font-family: inherit;
-    cursor: pointer;
-    background: var(--card);
-    color: var(--ink-muted);
-    border: 1px solid var(--border);
-  }
-  .page-pill.active { background: var(--care); color: #fff; border-color: var(--care); }
-  #probationPage .page-pill.active { background: var(--pb-accent); border-color: var(--pb-accent); }
 
   /* stat tiles */
   .tiles {
@@ -183,6 +245,9 @@
   @media (max-width: 640px) {
     .tiles { grid-template-columns: repeat(2, 1fr); }
   }
+  @media (max-width: 520px) {
+    .tiles { grid-template-columns: 1fr; }
+  }
   .tile {
     background: var(--card);
     border: 1px solid var(--border);
@@ -191,24 +256,31 @@
     box-shadow: var(--shadow);
     display: flex;
     flex-direction: column;
-    gap: 8px;
-    border-top: 3px solid var(--accent, var(--care));
+    gap: 10px;
   }
   .tile.total    { --accent: var(--teal); }
   .tile.care     { --accent: var(--care); }
   .tile.mzi      { --accent: var(--mzi); }
   .tile.avg      { --accent: var(--violet); }
   .tile .label {
-    font-size: 12.5px;
-    font-weight: 500;
+    font-size: 13.5px;
+    font-weight: 600;
     color: var(--ink-2);
     display: flex;
     align-items: center;
     gap: 6px;
   }
   .tile .dot {
-    width: 8px; height: 8px; border-radius: 50%;
-    display: inline-block;
+    width: 26px; height: 26px; border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    background: color-mix(in srgb, var(--accent) 13%, #fff);
+  }
+  .tile .dot::after {
+    content: "";
+    width: 9px; height: 9px; border-radius: 50%;
     background: var(--accent);
   }
   .tile .value {
@@ -653,6 +725,21 @@
 </style>
 </head>
 <body>
+<div class="app">
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-head">
+    <div class="brand">
+      <span class="brand-name">HR Board</span>
+      <span class="brand-sub">GC케어 · GC메디아이</span>
+    </div>
+    <button type="button" class="collapse-btn" id="sidebarToggle" aria-label="메뉴 접기" aria-expanded="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg></button>
+  </div>
+  <nav>
+    <button type="button" class="nav-item active" data-page="hire" title="입사현황"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6"/><path d="M22 11h-6"/></svg><span class="nav-label">입사현황</span></button>
+    <button type="button" class="nav-item" data-page="probation" title="수습현황"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/><path d="m9 16 2 2 4-4"/></svg><span class="nav-label">수습현황</span></button>
+  </nav>
+</aside>
+<main class="main">
 
 <div class="wrap" id="hirePage">
   <header class="top">
@@ -666,10 +753,6 @@
       </div>
     </div>
     <div style="display:flex; flex-direction:column; align-items:flex-end; gap:10px;">
-      <div class="page-pills">
-        <button type="button" class="page-pill active" data-page="hire">입사현황</button>
-        <button type="button" class="page-pill" data-page="probation">수습현황</button>
-      </div>
       <div class="refresh-row">
         <span id="updatedAt">불러오는 중…</span>
         <button class="iconbtn" id="refreshBtn" type="button">새로고침</button>
@@ -796,10 +879,6 @@ grant select on public.hire_stats to anon;</pre>
       </div>
     </div>
     <div style="display:flex; flex-direction:column; align-items:flex-end; gap:10px;">
-      <div class="page-pills">
-        <button type="button" class="page-pill" data-page="hire">입사현황</button>
-        <button type="button" class="page-pill active" data-page="probation">수습현황</button>
-      </div>
       <div class="refresh-row">
         <span id="pbUpdatedAt">불러오는 중…</span>
         <button class="iconbtn" id="pbRefreshBtn" type="button">새로고침</button>
@@ -1455,12 +1534,29 @@ grant select on public.hire_stats to anon;</pre>
     hirePageEl.hidden = page !== "hire";
     probationPageEl.hidden = page !== "probation";
     document.body.classList.toggle("showing-probation", page === "probation");
-    document.querySelectorAll(".page-pill").forEach(function (btn) {
+    document.querySelectorAll(".nav-item").forEach(function (btn) {
       btn.classList.toggle("active", btn.getAttribute("data-page") === page);
     });
   }
-  document.querySelectorAll(".page-pill").forEach(function (btn) {
+  document.querySelectorAll(".nav-item").forEach(function (btn) {
     btn.addEventListener("click", function () { showPage(btn.getAttribute("data-page")); });
+  });
+
+  // ── 사이드바 접기/펴기 (접힘 상태는 이 브라우저에만 기억) ───────────
+  var sidebarEl = document.getElementById("sidebar");
+  var sidebarToggleEl = document.getElementById("sidebarToggle");
+  function setSidebarCollapsed(collapsed) {
+    sidebarEl.classList.toggle("collapsed", collapsed);
+    sidebarToggleEl.setAttribute("aria-expanded", String(!collapsed));
+    sidebarToggleEl.setAttribute("aria-label", collapsed ? "메뉴 펼치기" : "메뉴 접기");
+  }
+  var savedCollapsed = null;
+  try { savedCollapsed = localStorage.getItem("sidebarCollapsed"); } catch (e) {}
+  setSidebarCollapsed(savedCollapsed === null ? window.innerWidth < 720 : savedCollapsed === "1");
+  sidebarToggleEl.addEventListener("click", function () {
+    var collapsed = !sidebarEl.classList.contains("collapsed");
+    setSidebarCollapsed(collapsed);
+    try { localStorage.setItem("sidebarCollapsed", collapsed ? "1" : "0"); } catch (e) {}
   });
 
   // ── 수습현황 보드 ──────────────────────────────────────────────────
@@ -1787,5 +1883,7 @@ grant select on public.hire_stats to anon;</pre>
   load();
 })();
 </script>
+</main>
+</div>
 </body>
 </html>
