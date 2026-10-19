@@ -878,7 +878,7 @@ grant select on public.hire_stats to anon;</pre>
       <div class="pb-group-body" id="pbCompletedBody" hidden></div>
     </div>
 
-    <div class="footnote">중간평가=입사일+40일, 최종평가=입사일+70일, 수습종료=입사일+3개월 기준으로 자동 계산됩니다. 진행중 인원은 다음 일정(중간평가/최종평가/종료) 기준으로 나눠서 표시되며, 입사예정·수습종료 인원은 위/아래 목록에서 펼쳐볼 수 있습니다.</div>
+    <div class="footnote">중간평가=입사일+40일, 최종평가=입사일+70일, 수습종료=입사일+3개월 기준으로 자동 계산됩니다. 평가 작성기간은 각 평가일로부터 달력 기준 7일입니다. 진행중 인원은 다음 일정(중간평가/최종평가/종료) 기준으로 나눠서 표시되며, 입사예정·수습종료 인원은 위/아래 목록에서 펼쳐볼 수 있습니다.</div>
   </div>
 </div>
 
@@ -907,7 +907,7 @@ grant select on public.hire_stats to anon;</pre>
   var infoIconEl = document.getElementById("infoIcon");
   var INFO_TEXT = "온보딩캘린더에 등록된 GC케어·GC메디아이 신규입사자 데이터를 자동으로 집계합니다.<br>전체 사용자의 데이터가 실시간 반영됩니다.";
   var pbInfoIconEl = document.getElementById("pbInfoIcon");
-  var PB_INFO_TEXT = "온보딩캘린더에 등록된 입사일을 기준으로 중간평가(입사+40일)·최종평가(입사+70일)·수습종료(입사+3개월) 일정을 자동으로 계산합니다.<br>전체 사용자의 데이터가 실시간 반영됩니다.";
+  var PB_INFO_TEXT = "온보딩캘린더에 등록된 입사일을 기준으로 중간평가(입사+40일)·최종평가(입사+70일)·수습종료(입사+3개월) 일정을 자동으로 계산합니다. 평가 작성기간은 각 평가일로부터 달력 기준 7일입니다.<br>전체 사용자의 데이터가 실시간 반영됩니다.";
 
   var pbLoadingEl = document.getElementById("pbLoadingState");
   var pbErrorEl = document.getElementById("pbErrorState");
