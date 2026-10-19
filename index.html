@@ -878,7 +878,7 @@ grant select on public.hire_stats to anon;</pre>
       <div class="pb-group-body" id="pbCompletedBody" hidden></div>
     </div>
 
-    <div class="footnote">중간평가 마감=입사일+47일, 최종평가 마감=입사일+77일, 수습종료=입사일+3개월 기준으로 자동 계산됩니다. 진행중 인원은 다음 일정(중간평가/최종평가/종료) 기준으로 나눠서 표시되며, 입사예정·수습종료 인원은 위/아래 목록에서 펼쳐볼 수 있습니다.</div>
+    <div class="footnote">중간평가=입사일+40일, 최종평가=입사일+70일, 수습종료=입사일+3개월 기준으로 자동 계산됩니다. 진행중 인원은 다음 일정(중간평가/최종평가/종료) 기준으로 나눠서 표시되며, 입사예정·수습종료 인원은 위/아래 목록에서 펼쳐볼 수 있습니다.</div>
   </div>
 </div>
 
@@ -1484,7 +1484,7 @@ grant select on public.hire_stats to anon;</pre>
     var tableHtml =
       '<div style="overflow-x:auto; padding:0 20px 16px 20px;">' +
         '<table class="pb-tbl">' +
-          '<thead><tr><th>이름</th><th>회사</th><th>부서</th><th>구분</th><th>입사일</th><th>중간평가</th><th>최종평가</th><th>수습종료</th></tr></thead>' +
+          '<thead><tr><th>이름</th><th>회사</th><th>부서</th><th>구분</th><th>입사일</th><th>중간평가(D+40)</th><th>최종평가(D+70)</th><th>수습종료(3개월)</th></tr></thead>' +
           '<tbody>' + tbodyHtml + '</tbody>' +
         '</table>' +
       '</div>';
@@ -1538,8 +1538,8 @@ grant select on public.hire_stats to anon;</pre>
         department: r.department,
         employmentType: r.employment_type,
         hire: hire,
-        mid: addDays(hire, 47),
-        final: addDays(hire, 77),
+        mid: addDays(hire, 40),
+        final: addDays(hire, 70),
         end: addMonths(hire, 3)
       };
     });
