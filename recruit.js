@@ -148,7 +148,17 @@
 
   // ── 계산 ───────────────────────────────────────────────────────
   function m(p) { return data.manual[p.key] || {}; }
-  function yearRows() { return data.postings.filter(function (p) { return p.year === state.year && !p.excluded; }); }
+  // 같은 포지션이 엑셀(과거 기록)과 그리팅(마감 공고)에 모두 있으면 엑셀 행만 보여준다
+  function normPos(x) { return String(x || "").replace(/\(.*?\)|\s/g, "").toLowerCase(); }
+  function isDupOfExcel(p) {
+    if (p.source !== "greeting" || p.status !== "done") return false;
+    return data.postings.some(function (x) {
+      if (x.source !== "excel" || x.company !== p.company || (x.team || "") !== (p.team || "")) return false;
+      if (normPos(x.position) !== normPos(p.position)) return false;
+      return !x.done_date || !p.done_date || Math.abs(new Date(x.done_date) - new Date(p.done_date)) <= 60 * 86400000;
+    });
+  }
+  function yearRows() { return data.postings.filter(function (p) { return p.year === state.year && !p.excluded && !isDupOfExcel(p); }); }
   function isOpen(p) { return p.status === "open"; }
 
   function renderAll(animate) { renderPos(); drawChart(animate !== false); renderFilters(); renderTable(); }
@@ -305,7 +315,7 @@
   // 완료 건 ↔ 입사현황(온보딩캘린더) 연결: 같은 회사·팀, 완료일 전후 입사일. 저장하지 않고 화면에서만 맞춤
   function matchHires() {
     var used = {};
-    var done = data.postings.filter(function (p) { return p.status === "done" && p.done_date && !p.hire_names; })
+    var done = data.postings.filter(function (p) { return p.status === "done" && p.done_date && !p.hire_names && !isDupOfExcel(p); })
       .sort(function (a, b) { return a.done_date.localeCompare(b.done_date); });
     done.forEach(function (p) {
       var team = (p.team || "").replace(/\s/g, ""), dd = new Date(p.done_date), need = (data.manual[p.key] || {}).headcount || p.pass_count || 1;
