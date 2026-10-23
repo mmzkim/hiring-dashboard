@@ -94,39 +94,48 @@
 .r-tip b { font-weight: 800; }
 .r-tip span { float: right; margin-left: 14px; font-variant-numeric: tabular-nums; }
 
-/* 로그인: 왼쪽 안내(연한 초록) · 오른쪽 로그인 */
+/* 로그인: 확정 시안 그대로(왼쪽 안내·우하단 일러스트, 오른쪽 로그인). 모든 규칙은 .r-login 안에서만 */
 .r-login {
-  --l-bg: #FFFFFF; --l-panel: #ECF7F0; --l-ink: #111827; --l-ink2: #374151; --l-muted: #6B7280; --l-line: #D1D5DB;
-  --l-card: #FFFFFF; --l-card2: #F3F4F6; --l-bar: #D1D5DB; --l-bar2: #9CA3AF; --l-btn: #15803D; --l-btn-ink: #FFFFFF;
-  position: fixed; inset: 0; z-index: 100; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  background: var(--l-bg); color: var(--l-ink); overflow: auto;
-  font-family: "Noto Sans KR", "Pretendard", "Malgun Gothic", sans-serif;
+  --bg:#ffffff; --pane:#f3f7f4; --fg:#16231c; --muted:#5d6b63; --line:#d5dfd8;
+  --accent:#1f8f5f; --accent-fg:#ffffff; --warm:#f08a3c; --input:#ffffff;
+  --font:'Noto Sans KR','Malgun Gothic',system-ui,sans-serif;
+  position: fixed; inset: 0; z-index: 100; overflow: auto;
+  background: var(--bg); color: var(--fg); font-family: var(--font); font-size: 14px;
 }
-@media (prefers-color-scheme: dark) {
-  .r-login { --l-bg: #111418; --l-panel: #15261C; --l-ink: #F3F4F6; --l-ink2: #D1D5DB; --l-muted: #9CA3AF; --l-line: #374151;
-    --l-card: #1F2937; --l-card2: #263241; --l-bar: #374151; --l-bar2: #6B7280; --l-btn: #22A35A; color-scheme: dark; }
+@media (prefers-color-scheme: dark) { .r-login {
+  --bg:#121815; --pane:#18211c; --fg:#e8f0eb; --muted:#9db0a5; --line:#2c3a32;
+  --accent:#3fb585; --accent-fg:#0d1a13; --warm:#f29a55; --input:#1c2620; color-scheme:dark } }
+.r-login * { box-sizing: border-box; }
+.r-login .wrap { display:grid; grid-template-columns:1fr 1fr; min-height:100vh; }
+.r-login .left { background:var(--pane); position:relative; overflow:hidden; display:flex; align-items:center;
+  padding-block:48px; padding-left:max(16px,env(safe-area-inset-left,0px)); padding-right:16px; }
+.r-login .copy { max-width:420px; margin-inline:auto; position:relative; z-index:1; }
+.r-login .brand { display:flex; align-items:center; gap:10px; font-weight:900; font-size:20px; letter-spacing:-.02em; }
+.r-login .brand i { width:28px; height:28px; border-radius:8px; background:var(--accent); display:grid; place-items:center; }
+.r-login .brand i svg { width:16px; height:16px; }
+.r-login h1 { font-size:30px; line-height:1.35; letter-spacing:-.03em; margin:28px 0 14px; text-wrap:balance; font-weight:900; }
+.r-login .lead { color:var(--muted); font-size:15px; line-height:1.7; margin:0 0 26px; }
+.r-login .how { margin:0; padding:0; list-style:none; display:grid; gap:12px; font-size:14px; line-height:1.6; }
+.r-login .how li { padding-left:14px; border-left:3px solid var(--accent); }
+.r-login .how b { font-weight:700; }
+.r-login .art { position:absolute; right:-24px; bottom:-24px; width:320px; max-width:70%; opacity:.95; }
+.r-login .right { display:flex; align-items:center; justify-content:center;
+  padding-block:48px; padding-right:max(16px,env(safe-area-inset-right,0px)); padding-left:16px; }
+.r-login form { width:100%; max-width:380px; }
+.r-login label { display:block; font-size:13px; font-weight:500; margin:0 0 8px; }
+.r-login input { width:100%; height:48px; border:1px solid var(--line); border-radius:8px; background:var(--input);
+  color:var(--fg); padding:0 14px; font:inherit; font-size:15px; margin-bottom:20px; }
+.r-login input:focus { outline:2px solid var(--accent); outline-offset:1px; border-color:transparent; }
+.r-login button { width:100%; height:48px; border:0; border-radius:8px; background:var(--accent); color:var(--accent-fg);
+  font:inherit; font-weight:700; font-size:15px; cursor:pointer; margin-top:4px; }
+.r-login button:focus-visible { outline:2px solid var(--fg); outline-offset:2px; }
+.r-login .err { color:#DC2626; font-size:12.5px; margin:-12px 0 8px; min-height:1em; }
+@media (max-width:760px) {
+  .r-login .wrap { grid-template-columns:1fr; }
+  .r-login .left { padding-block:36px 150px; padding-right:max(16px,env(safe-area-inset-right,0px)); }
+  .r-login .art { width:220px; }
+  .r-login .right { padding-block:36px; }
 }
-@media (max-width: 760px) { .r-login { grid-template-columns: 1fr; } .r-login-art { display: none; } }
-.r-login-info { position: relative; background: var(--l-panel); padding: 56px 48px 180px; display: flex; flex-direction: column; gap: 18px; justify-content: center; overflow: hidden; }
-@media (max-width: 760px) { .r-login-info { padding: 36px 24px; } }
-.r-login-brand { display: flex; align-items: center; gap: 8px; font-size: 18px; font-weight: 800; letter-spacing: -0.02em; }
-.r-login-mark { width: 22px; height: 22px; border-radius: 6px; background: linear-gradient(135deg, #16A34A 0 60%, #EA580C 60%); }
-.r-login-info h2 { margin: 0; font-size: 30px; line-height: 1.35; font-weight: 800; letter-spacing: -0.03em; text-wrap: balance; }
-.r-login-desc { margin: 0; font-size: 14.5px; line-height: 1.65; color: var(--l-ink2); max-width: 440px; }
-.r-login-notes { margin: 0; padding: 14px 16px 14px 32px; display: flex; flex-direction: column; gap: 6px; font-size: 13.5px; line-height: 1.5; color: var(--l-ink2); background: var(--l-card); border: 1px solid var(--l-line); border-radius: 10px; max-width: 440px; }
-.r-login-art { position: absolute; right: 18px; bottom: 10px; width: 230px; height: auto; }
-.r-login-art .card { fill: var(--l-card); stroke: var(--l-line); stroke-width: 1.5; }
-.r-login-art .card.back { fill: var(--l-card2); }
-.r-login-art .line { fill: var(--l-bar); }
-.r-login-art .line.strong { fill: var(--l-bar2); }
-.r-login-form { display: grid; place-items: center; padding: 32px 16px; }
-.r-login form { width: min(360px, 100%); display: flex; flex-direction: column; gap: 14px; }
-.r-login form h2 { margin: 0 0 6px; font-size: 22px; font-weight: 800; }
-.r-login label { font-size: 13px; font-weight: 700; color: var(--l-ink2); display: flex; flex-direction: column; gap: 6px; }
-.r-login input { font: inherit; font-size: 15px; padding: 11px 12px; border: 1px solid var(--l-line); border-radius: 8px; background: var(--l-bg); color: var(--l-ink); }
-.r-login input:focus { outline: 2px solid var(--l-btn); outline-offset: 1px; }
-.r-login button { font: inherit; font-weight: 800; font-size: 15px; padding: 12px; border: 0; border-radius: 8px; background: var(--l-btn); color: var(--l-btn-ink); cursor: pointer; margin-top: 4px; }
-.r-login .err { color: #DC2626; font-size: 12.5px; min-height: 1em; }
 
 /* 인원 숫자 가운데(스핀 버튼 숨김), 비고 선택+입력 */
 #recruitPage input.r-cell[type=number] { -moz-appearance: textfield; appearance: textfield; }

@@ -21,28 +21,33 @@
   function showLogin() {
     var box = document.createElement("div");
     box.className = "r-login";
+    // 확정 시안(채용현황보드 로그인) 그대로. 입력창만 기존 로그인 동작(rId·rPw·rErr)에 연결
     box.innerHTML =
-      '<section class="r-login-info">' +
-        '<div class="r-login-brand"><span class="r-login-mark" aria-hidden="true"></span>채용현황보드</div>' +
-        '<h2>채용·입사·수습 현황을<br>한 화면에서 확인하세요</h2>' +
-        '<p class="r-login-desc">그리팅의 채용 데이터와 온보딩 정보를 자동으로 모아 보여주는 현황판이에요. 평일 낮에는 10분마다 최신 상태로 바뀌어요.</p>' +
-        '<ul class="r-login-notes"><li>온보딩캘린더에 등록된 계정으로만 로그인할 수 있어요.</li><li>계정이 없다면 관리자에게 계정을 요청해 주세요.</li></ul>' +
-        '<svg class="r-login-art" viewBox="0 0 240 190" aria-hidden="true">' +
-          '<rect x="34" y="40" width="120" height="140" rx="12" class="card back"/>' +
-          '<rect x="70" y="20" width="120" height="140" rx="12" class="card"/>' +
-          '<rect x="88" y="44" width="70" height="8" rx="4" class="line strong"/>' +
-          '<rect x="88" y="64" width="84" height="6" rx="3" class="line"/>' +
-          '<rect x="88" y="80" width="64" height="6" rx="3" class="line"/>' +
-          '<rect x="88" y="104" width="36" height="22" rx="5" fill="#EA580C"/>' +
-          '<rect x="130" y="104" width="42" height="22" rx="5" class="line"/>' +
-          '<circle cx="186" cy="150" r="26" fill="#16A34A"/>' +
-          '<path d="M174 150l9 9 17-18" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>' +
-        '</svg>' +
-      '</section>' +
-      '<section class="r-login-form"><form id="rLoginForm"><h2>로그인</h2>' +
-        '<label for="rId">아이디<input id="rId" autocomplete="username" required></label>' +
-        '<label for="rPw">비밀번호<input id="rPw" type="password" autocomplete="current-password" required></label>' +
-        '<div class="err" id="rErr"></div><button type="submit">로그인</button></form></section>';
+      '<div class="wrap">' +
+      '<section class="left" aria-label="이용 안내"><div class="copy">' +
+        '<div class="brand"><i><svg viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3.2 3L13 4.8" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></i>채용현황보드</div>' +
+        '<h1>채용·입사·수습 현황을<br>한 화면에서 확인하세요</h1>' +
+        '<p class="lead">그리팅의 채용 데이터와 온보딩 정보를 자동으로 모아 보여주는 현황판이에요. 평일 낮에는 10분마다 최신 상태로 바뀌어요.</p>' +
+        '<ul class="how"><li><b>온보딩캘린더에 등록된 계정</b>으로만 로그인할 수 있어요.</li><li>계정이 없다면 <b>관리자에게 계정을 요청</b>해 주세요.</li></ul>' +
+      '</div>' +
+      '<svg class="art" viewBox="0 0 320 260" fill="none" aria-hidden="true">' +
+        '<rect x="150" y="70" width="150" height="170" rx="14" fill="var(--line)"/>' +
+        '<rect x="110" y="40" width="150" height="170" rx="14" fill="var(--bg)" stroke="var(--line)" stroke-width="2"/>' +
+        '<rect x="130" y="62" width="70" height="10" rx="5" fill="var(--accent)"/>' +
+        '<rect x="130" y="86" width="110" height="8" rx="4" fill="var(--line)"/>' +
+        '<rect x="130" y="104" width="96" height="8" rx="4" fill="var(--line)"/>' +
+        '<rect x="130" y="122" width="104" height="8" rx="4" fill="var(--line)"/>' +
+        '<rect x="130" y="150" width="46" height="34" rx="6" fill="var(--accent)" opacity=".18"/>' +
+        '<rect x="184" y="136" width="46" height="48" rx="6" fill="var(--warm)" opacity=".28"/>' +
+        '<circle cx="80" cy="170" r="34" fill="var(--accent)"/>' +
+        '<path d="M64 170l12 12 22-24" stroke="var(--accent-fg)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>' +
+      '</svg></section>' +
+      '<section class="right" aria-label="로그인"><form id="rLoginForm">' +
+        '<label for="rId">아이디</label><input id="rId" type="text" autocomplete="username" placeholder="온보딩캘린더 아이디" required>' +
+        '<label for="rPw">비밀번호</label><input id="rPw" type="password" autocomplete="current-password" placeholder="비밀번호" required>' +
+        '<div class="err" id="rErr" role="alert"></div>' +
+        '<button type="submit">로그인</button></form></section>' +
+      '</div>';
     document.body.appendChild(box);
     box.querySelector("form").addEventListener("submit", function (e) {
       e.preventDefault();
