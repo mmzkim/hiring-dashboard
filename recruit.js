@@ -23,22 +23,20 @@
     box.className = "r-login";
     box.innerHTML =
       '<section class="r-login-info">' +
-        '<div class="r-login-brand"><b>HR Board</b><span>GC케어 · GC메디아이 채용·온보딩 현황</span></div>' +
-        '<h2>채용부터 입사·수습까지<br>한 화면에서 확인하세요</h2>' +
-        '<div class="r-login-block"><h3>로그인 방법</h3><ul>' +
-          '<li>온보딩캘린더에 등록된 계정(아이디·비밀번호)으로만 로그인할 수 있어요.</li>' +
-          '<li>계정이 없으면 관리자(인사팀 김무준)에게 계정을 요청하세요.</li></ul></div>' +
-        '<div class="r-login-block"><h3>이렇게 돌아가요</h3><ul>' +
-          '<li><b>채용현황</b> · 그리팅 공고·전형 정보를 평일 10분마다 자동으로 모아요.</li>' +
-          '<li><b>입사·수습현황</b> · 온보딩캘린더에 등록된 입사자 정보로 보여줘요.</li>' +
-          '<li>로그인한 사람만 볼 수 있고, 담당자·인원·비고는 화면에서 바로 고칠 수 있어요.</li></ul></div>' +
-        '<svg class="r-login-art" viewBox="0 0 260 200" aria-hidden="true">' +
-          '<rect x="20" y="120" width="34" height="60" rx="6" fill="#16A34A" opacity=".9"/>' +
-          '<rect x="64" y="90" width="34" height="90" rx="6" fill="#EA580C" opacity=".9"/>' +
-          '<rect x="108" y="60" width="34" height="120" rx="6" fill="#16A34A" opacity=".75"/>' +
-          '<rect x="152" y="30" width="34" height="150" rx="6" fill="#EA580C" opacity=".75"/>' +
-          '<polyline points="37,110 81,80 125,52 169,22 230,10" fill="none" stroke="#1F2937" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="6 6"/>' +
-          '<circle cx="230" cy="10" r="7" fill="#1F2937"/>' +
+        '<div class="r-login-brand"><span class="r-login-mark" aria-hidden="true"></span>채용현황보드</div>' +
+        '<h2>채용·입사·수습 현황을<br>한 화면에서 확인하세요</h2>' +
+        '<p class="r-login-desc">그리팅의 채용 데이터와 온보딩 정보를 자동으로 모아 보여주는 현황판이에요. 평일 낮에는 10분마다 최신 상태로 바뀌어요.</p>' +
+        '<ul class="r-login-notes"><li>온보딩캘린더에 등록된 계정으로만 로그인할 수 있어요.</li><li>계정이 없다면 관리자에게 계정을 요청해 주세요.</li></ul>' +
+        '<svg class="r-login-art" viewBox="0 0 240 190" aria-hidden="true">' +
+          '<rect x="34" y="40" width="120" height="140" rx="12" class="card back"/>' +
+          '<rect x="70" y="20" width="120" height="140" rx="12" class="card"/>' +
+          '<rect x="88" y="44" width="70" height="8" rx="4" class="line strong"/>' +
+          '<rect x="88" y="64" width="84" height="6" rx="3" class="line"/>' +
+          '<rect x="88" y="80" width="64" height="6" rx="3" class="line"/>' +
+          '<rect x="88" y="104" width="36" height="22" rx="5" fill="#EA580C"/>' +
+          '<rect x="130" y="104" width="42" height="22" rx="5" class="line"/>' +
+          '<circle cx="186" cy="150" r="26" fill="#16A34A"/>' +
+          '<path d="M174 150l9 9 17-18" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>' +
         '</svg>' +
       '</section>' +
       '<section class="r-login-form"><form id="rLoginForm"><h2>로그인</h2>' +
