@@ -109,3 +109,11 @@
 #recruitPage input.r-cell[type=number]::-webkit-inner-spin-button, #recruitPage input.r-cell[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
 #recruitPage .r-note { display: flex; flex-direction: column; gap: 2px; }
 #recruitPage .r-note-txt { font-weight: 400; }
+
+/* 구분 행: 진행 중은 회사 색 바탕으로 눈에 띄게, 완료는 회색 바탕 + 작은 회사 소제목 */
+#recruitPage table.r-data tr.group.open.care td { background: var(--r-care-bg); color: var(--r-care-text); border-left: 4px solid var(--r-care); }
+#recruitPage table.r-data tr.group.open.medi td { background: var(--r-medi-bg); color: var(--r-medi-text); border-left: 4px solid var(--r-medi); }
+#recruitPage table.r-data tr.group.fin td { background: #E5E7EB; color: #374151; border-top: 2px solid #9CA3AF; }
+#recruitPage table.r-data tr.group.sub td { background: #F3F4F6; font-size: 12px; font-weight: 700; padding: 3px 10px 3px 24px; color: #4B5563; }
+#recruitPage table.r-data tr.group.sub.care td::before { content: "● "; color: var(--r-care); }
+#recruitPage table.r-data tr.group.sub.medi td::before { content: "● "; color: var(--r-medi); }

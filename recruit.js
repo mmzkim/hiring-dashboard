@@ -338,15 +338,20 @@
       var list = rows.filter(function (p) { return isOpen(p) && (p.company || null) === c; }).sort(byStart);
       if (!list.length) return;
       nOpen += list.length;
-      html += '<tr class="group"><td colspan="22"><span class="sq" style="background:' + (c === "GC케어" ? "var(--r-care)" : c ? "var(--r-medi)" : "#9CA3AF") + '"></span>' +
+      html += '<tr class="group open ' + (CO[c] || "") + '"><td colspan="22"><span class="sq" style="background:' + (c === "GC케어" ? "var(--r-care)" : c ? "var(--r-medi)" : "#9CA3AF") + '"></span>' +
         esc(c || "표기 없음") + " · 진행 " + list.length + "건 (시작일 순)</td></tr>";
       list.forEach(function (p) { shown.push(p); html += row(p, ++seq, shown.length - 1); });
     });
     var done = rows.filter(function (p) { return !isOpen(p); }).sort(function (a, b) { return (b.done_date || "").localeCompare(a.done_date || ""); });
     nDone = done.length;
     if (done.length) {
-      html += '<tr class="group"><td colspan="22"><span class="sq" style="background:#9CA3AF"></span>완료 · ' + done.length + "건 (완료일 최근순)</td></tr>";
-      done.forEach(function (p) { shown.push(p); html += row(p, ++seq, shown.length - 1); });
+      html += '<tr class="group fin"><td colspan="22"><span class="sq" style="background:#9CA3AF"></span>완료 · ' + done.length + "건 (완료일 최근순)</td></tr>";
+      ["GC케어", "GC메디아이", null].forEach(function (c) {
+        var list = done.filter(function (p) { return (p.company || null) === c; });
+        if (!list.length) return;
+        html += '<tr class="group sub ' + (CO[c] || "") + '"><td colspan="22">' + esc(c || "표기 없음") + " · 완료 " + list.length + "건</td></tr>";
+        list.forEach(function (p) { shown.push(p); html += row(p, ++seq, shown.length - 1); });
+      });
     }
     if (!seq) html += '<tr><td colspan="22" class="r-empty">조건에 맞는 포지션이 없습니다.</td></tr>';
     page.querySelector("#rTable").innerHTML = html + "</tbody>";
