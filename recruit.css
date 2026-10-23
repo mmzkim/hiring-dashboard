@@ -1,0 +1,122 @@
+/* 채용현황 탭 (확정 시안 v5 기준). 모든 규칙은 #recruitPage 안에서만 적용 */
+#recruitPage {
+  --r-care: #16A34A; --r-care-bg: #DCFCE7; --r-care-text: #166534;
+  --r-medi: #EA580C; --r-medi-bg: #FFEDD5; --r-medi-text: #C2410C;
+  --r-ink: #111827; --r-ink-2: #374151; --r-ink-3: #6B7280;
+  --r-line: #D1D5DB; --r-line-strong: #9CA3AF;
+  --r-card: #FFFFFF; --r-header: #1F2937; --r-warn: #DC2626;
+  color: var(--r-ink);
+  font-variant-numeric: tabular-nums lining-nums;
+  max-width: none;
+}
+#recruitPage .r-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+#recruitPage .r-head h1 { font-size: 20px; font-weight: 800; letter-spacing: -0.02em; margin: 0; }
+#recruitPage .r-sync { display: inline-flex; align-items: center; gap: 5px; font-size: 11.5px; font-weight: 700; color: var(--r-care-text); background: var(--r-care-bg); border-radius: 999px; padding: 3px 10px; }
+#recruitPage .r-sync::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--r-care); }
+#recruitPage .r-sync.stale { color: #B45309; background: #FEF3C7; }
+#recruitPage .r-sync.stale::before { background: #D97706; }
+#recruitPage .r-spacer { flex: 1; }
+#recruitPage .r-time { font-size: 12px; color: var(--r-ink-3); }
+#recruitPage .r-sel { font: inherit; font-size: 12px; font-weight: 600; padding: 5px 8px; border: 1px solid var(--r-line-strong); border-radius: 8px; background: var(--r-card); color: var(--r-ink-2); }
+
+#recruitPage .r-top { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr); gap: 10px; }
+@media (max-width: 1000px) { #recruitPage .r-top { grid-template-columns: 1fr; } }
+#recruitPage .r-panel { background: var(--r-card); border: 1px solid var(--r-line); border-radius: 10px; padding: 12px 14px; display: flex; flex-direction: column; min-width: 0; }
+#recruitPage .r-panel-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 8px; }
+#recruitPage .r-panel-head .t { font-size: 18px; font-weight: 800; letter-spacing: -0.02em; }
+#recruitPage .r-panel-head .s { font-size: 11px; color: var(--r-ink-3); }
+
+#recruitPage .r-pos { width: 100%; border-collapse: collapse; flex: 1 1 auto; height: 100%; }
+#recruitPage .r-pos th { background: var(--r-header); color: #fff; font-size: 14px; font-weight: 700; padding: 7px 4px; text-align: center; border: 1px solid #374151; line-height: 1.3; }
+#recruitPage .r-pos th small { display: block; font-size: 11px; font-weight: 600; color: #FCA5A5; margin-top: 2px; }
+#recruitPage .r-pos td { border: 1px solid var(--r-line); padding: 6px 4px; text-align: center; color: var(--r-ink-2); white-space: nowrap; }
+#recruitPage .r-pos td.lbl { font-size: 15px; font-weight: 800; color: var(--r-ink); }
+#recruitPage .r-pos td.lbl.care { color: var(--r-care-text); }
+#recruitPage .r-pos td.lbl.medi { color: var(--r-medi-text); }
+#recruitPage .r-pos tr.total td { background: #F9FAFB; }
+#recruitPage .r-pos .v { font-size: 18px; font-weight: 800; color: var(--r-ink); }
+#recruitPage .r-lv { display: inline-block; vertical-align: 3px; margin-left: 6px; font-size: 11px; font-weight: 800; padding: 2px 7px; border-radius: 999px; }
+#recruitPage .r-lv.ok { background: var(--r-care-bg); color: var(--r-care-text); }
+#recruitPage .r-lv.many { background: #FEF3C7; color: #B45309; }
+#recruitPage .r-lv.over { background: #FEE2E2; color: #B91C1C; }
+
+#recruitPage .r-ctab { display: inline-flex; background: #E5E7EB; border-radius: 8px; padding: 2px; }
+#recruitPage .r-ctab button, #recruitPage .r-seg button { border: 0; background: transparent; font: inherit; font-size: 12px; font-weight: 700; color: var(--r-ink-2); padding: 4px 10px; border-radius: 6px; cursor: pointer; }
+#recruitPage .r-ctab button.on, #recruitPage .r-seg button.on { background: var(--r-card); color: var(--r-ink); box-shadow: 0 1px 2px rgba(0,0,0,.08); }
+#recruitPage .r-seg { display: inline-flex; background: #E5E7EB; border-radius: 8px; padding: 2px; }
+#recruitPage .r-seg button.on.care { color: var(--r-care-text); }
+#recruitPage .r-seg button.on.medi { color: var(--r-medi-text); }
+#recruitPage .r-legend { display: flex; gap: 12px; font-size: 11px; color: var(--r-ink-2); flex-wrap: wrap; margin: 0 0 4px; }
+#recruitPage .r-legend .sw { width: 10px; height: 10px; border-radius: 2px; display: inline-block; margin-right: 4px; vertical-align: -1px; }
+#recruitPage #rChart { width: 100%; flex: 1 1 0; min-height: 200px; display: block; }
+@media (prefers-reduced-motion: no-preference) {
+  #recruitPage #rChart.anim g.col { animation: rRise .35s ease both; transform-origin: 50% 100%; transform-box: fill-box; }
+  #recruitPage #rChart.anim g.lbls { animation: rFade .25s ease .62s both; }
+}
+@keyframes rRise { from { transform: scaleY(.2); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes rFade { from { opacity: 0; } to { opacity: 1; } }
+
+#recruitPage .r-filters { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+#recruitPage .r-count { margin-left: auto; font-size: 12px; color: var(--r-ink-3); }
+
+#recruitPage .r-tbl-wrap { background: var(--r-card); border: 1px solid var(--r-line-strong); border-radius: 10px; overflow: auto; }
+#recruitPage table.r-data { border-collapse: collapse; width: 100%; table-layout: fixed; font-size: 11px; }
+#recruitPage table.r-data th { background: var(--r-header); color: #fff; font-size: 12px; font-weight: 700; padding: 6px 2px; text-align: center; border: 1px solid #374151; line-height: 1.25; word-break: keep-all; position: sticky; top: 0; z-index: 2; }
+#recruitPage table.r-data td { border: 1px solid var(--r-line); padding: 4px 2px; text-align: center; color: var(--r-ink-2); word-break: keep-all; overflow-wrap: anywhere; background: var(--r-card); }
+#recruitPage table.r-data td.nw { white-space: nowrap; }
+#recruitPage table.r-data td.pos { font-weight: 700; color: var(--r-ink); }
+#recruitPage table.r-data td.num { font-weight: 700; color: var(--r-ink); }
+#recruitPage table.r-data tr.group td { background: #F9FAFB; font-size: 14px; font-weight: 800; text-align: left; padding: 6px 10px; color: var(--r-ink); }
+#recruitPage table.r-data tr.group .sq { display: inline-block; width: 9px; height: 9px; border-radius: 2px; margin-right: 6px; }
+#recruitPage table.r-data tr.done td { background: #F3F4F6; }
+#recruitPage td.na { background: #F3F4F6 !important; color: #D1D5DB; }
+#recruitPage td.cur { font-weight: 800; }
+#recruitPage td.cur.care { background: var(--r-care-bg) !important; color: var(--r-care-text); box-shadow: inset 0 0 0 2px var(--r-care); }
+#recruitPage td.cur.medi { background: var(--r-medi-bg) !important; color: var(--r-medi-text); box-shadow: inset 0 0 0 2px var(--r-medi); }
+#recruitPage .r-badge { display: inline-block; padding: 1px 6px; border-radius: 999px; font-size: 10px; font-weight: 700; white-space: nowrap; }
+#recruitPage .r-badge.care { background: var(--r-care-bg); color: var(--r-care-text); }
+#recruitPage .r-badge.medi { background: var(--r-medi-bg); color: var(--r-medi-text); }
+#recruitPage .r-badge.none { background: #E5E7EB; color: #4B5563; }
+#recruitPage .r-pill { display: inline-block; padding: 1px 6px; border-radius: 5px; font-size: 10px; font-weight: 700; white-space: nowrap; }
+#recruitPage .r-pill.done { background: #E5E7EB; color: #4B5563; }
+#recruitPage .r-pill.ing { background: #DBEAFE; color: #1D4ED8; }
+#recruitPage .r-cell { font: inherit; font-size: 11px; color: var(--r-ink); background: transparent; border: 1px dashed var(--r-line-strong); border-radius: 4px; width: 100%; padding: 1px; text-align: center; text-align-last: center; }
+#recruitPage select.r-cell { cursor: pointer; appearance: none; -webkit-appearance: none; font-weight: 700; }
+#recruitPage select.r-cell.unset { color: var(--r-warn); border-color: var(--r-warn); }
+#recruitPage .r-star { border: 0; background: none; cursor: pointer; font-size: 13px; color: #D1D5DB; padding: 0; }
+#recruitPage .r-star.on { color: #F59E0B; }
+#recruitPage .r-hist { border-bottom: 1px dotted var(--r-line-strong); }
+#recruitPage .r-ch { display: inline-block; max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; border-bottom: 1px dotted #9CA3AF; cursor: default; }
+#recruitPage .r-tbl-legend { display: flex; gap: 16px; flex-wrap: wrap; font-size: 11px; font-weight: 600; color: var(--r-ink-2); }
+#recruitPage .r-tbl-legend i { display: inline-block; width: 16px; height: 11px; border-radius: 2px; margin-right: 4px; vertical-align: -1px; }
+#recruitPage .r-empty { padding: 28px; text-align: center; color: var(--r-ink-3); }
+.r-tip { position: fixed; z-index: 60; background: #1F2937; color: #fff; font-size: 11.5px; line-height: 1.6; padding: 7px 10px; border-radius: 8px; box-shadow: 0 4px 14px rgba(0,0,0,.18); pointer-events: none; white-space: nowrap; }
+.r-tip b { font-weight: 800; }
+.r-tip span { float: right; margin-left: 14px; font-variant-numeric: tabular-nums; }
+
+/* 로그인 */
+.r-login { position: fixed; inset: 0; z-index: 100; background: #F3F4F6; display: grid; place-items: center; padding: 16px; }
+.r-login form { background: #fff; border: 1px solid #E5E7EB; border-radius: 12px; padding: 28px; width: min(360px, 100%); display: flex; flex-direction: column; gap: 12px; box-shadow: 0 4px 20px rgba(0,0,0,.06); }
+.r-login h2 { margin: 0 0 4px; font-size: 18px; }
+.r-login p { margin: 0; font-size: 12.5px; color: #6B7280; }
+.r-login label { font-size: 12.5px; font-weight: 700; color: #374151; display: flex; flex-direction: column; gap: 4px; }
+.r-login input { font: inherit; font-size: 14px; padding: 9px 10px; border: 1px solid #D1D5DB; border-radius: 8px; }
+.r-login button { font: inherit; font-weight: 800; font-size: 14px; padding: 10px; border: 0; border-radius: 8px; background: #1F2937; color: #fff; cursor: pointer; }
+.r-login .err { color: #DC2626; font-size: 12.5px; min-height: 1em; }
+
+/* 인원 숫자 가운데(스핀 버튼 숨김), 비고 선택+입력 */
+#recruitPage input.r-cell[type=number] { -moz-appearance: textfield; appearance: textfield; }
+#recruitPage input.r-cell[type=number]::-webkit-inner-spin-button, #recruitPage input.r-cell[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+#recruitPage .r-note { display: flex; flex-direction: column; gap: 2px; }
+#recruitPage .r-note-txt { font-weight: 400; }
+
+/* 구분 행: 진행 중은 회사 색 바탕으로 눈에 띄게, 완료는 회색 바탕 + 작은 회사 소제목 */
+#recruitPage table.r-data tr.group.open.care td { background: var(--r-care-bg); color: var(--r-care-text); border-left: 4px solid var(--r-care); }
+#recruitPage table.r-data tr.group.open.medi td { background: var(--r-medi-bg); color: var(--r-medi-text); border-left: 4px solid var(--r-medi); }
+#recruitPage table.r-data tr.group.fin td { background: #E5E7EB; color: #374151; border-top: 2px solid #9CA3AF; }
+#recruitPage table.r-data tr.group.sub td { background: #F3F4F6; font-size: 12px; font-weight: 700; padding: 3px 10px 3px 24px; color: #4B5563; }
+#recruitPage table.r-data tr.group.sub.care td::before { content: "● "; color: var(--r-care); }
+#recruitPage table.r-data tr.group.sub.medi td::before { content: "● "; color: var(--r-medi); }
+
+#recruitPage .r-note-view { cursor: pointer; border-bottom: 1px dashed var(--r-line-strong); }
+#recruitPage .r-note-view:hover { color: var(--r-ink); }
