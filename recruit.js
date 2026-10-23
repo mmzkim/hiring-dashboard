@@ -7,7 +7,7 @@
   var CO = { "GC케어": "care", "GC메디아이": "medi" };
   var OWNERS = ["김무준", "김진"];
   var state = { co: "all", st: "all", team: "", owner: "", year: null, chart: "open" };
-  var data = { postings: [], manual: {}, logs: {}, sync: null };
+  var data = { postings: [], manual: {}, logs: {}, sync: null, hires: [] };
   var page, tip;
 
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
@@ -58,7 +58,8 @@
       sb.from("recruit_postings").select("*"),
       sb.from("recruit_manual").select("*"),
       sb.from("recruit_edit_log").select("key,field,old_value,new_value,username,edited_at").order("edited_at", { ascending: false }).limit(1000),
-      sb.from("recruit_sync_log").select("run_at,ok,kind").eq("ok", true).neq("kind", "excel").order("run_at", { ascending: false }).limit(1)
+      sb.from("recruit_sync_log").select("run_at,ok,kind").eq("ok", true).neq("kind", "excel").order("run_at", { ascending: false }).limit(1),
+      sb.from("hire_stats").select("name,company,hire_date,department")
     ]).then(function (res) {
       var bad = res.find(function (r) { return r.error; });
       if (bad) throw bad.error;
@@ -68,6 +69,8 @@
       data.logs = {};
       res[2].data.forEach(function (l) { (data.logs[l.key + "|" + l.field] = data.logs[l.key + "|" + l.field] || []).push(l); });
       data.sync = res[3].data[0] || null;
+      data.hires = res[4].data || [];
+      matchHires();
     });
   }
 
@@ -98,14 +101,14 @@
       '<div class="r-tbl-wrap"><table class="r-data" id="rTable"></table></div>' +
       '<div class="r-tbl-legend"><span><i style="background:var(--r-care-bg); box-shadow: inset 0 0 0 2px var(--r-care)"></i><i style="background:var(--r-medi-bg); box-shadow: inset 0 0 0 2px var(--r-medi)"></i>현재 진행 단계</span>' +
         '<span><i style="background:#F3F4F6"></i>해당 공고에 없는 전형</span><span><i style="background:#F3F4F6; border:1px solid #D1D5DB"></i>완료 포지션</span>' +
-        '<span>비고에는 사람 이름을 쓰지 말아 주세요(증원/충원만).</span></div>';
+        '<span>비고: 증원 · 충원(퇴사자 입력) · 기타(직접 입력)</span></div>';
 
     function seg(id, k) {
       page.querySelectorAll("#" + id + " button").forEach(function (b) {
         b.addEventListener("click", function () {
           state[k] = b.dataset.v;
           page.querySelectorAll("#" + id + " button").forEach(function (x) { x.classList.toggle("on", x === b); });
-          renderAll();
+          renderAll(true);
         });
       });
     }
@@ -119,14 +122,14 @@
     });
     page.querySelector("#rTeam").addEventListener("change", function (e) { state.team = e.target.value; renderTable(); });
     page.querySelector("#rOwner").addEventListener("change", function (e) { state.owner = e.target.value; renderTable(); });
-    page.querySelector("#rYear").addEventListener("change", function (e) { state.year = +e.target.value; renderAll(); });
-    page.querySelector("#rRefresh").addEventListener("click", refresh);
+    page.querySelector("#rYear").addEventListener("change", function (e) { state.year = +e.target.value; renderAll(true); });
+    page.querySelector("#rRefresh").addEventListener("click", function () { refresh(false); });
     if (window.ResizeObserver) new ResizeObserver(function () { drawChart(false); }).observe(page.querySelector("#rChart"));
-    refresh();
-    setInterval(refresh, 5 * 60 * 1000);
+    refresh(true);
+    setInterval(function () { refresh(false); }, 10 * 60 * 1000);
   }
 
-  function refresh() {
+  function refresh(animate) {
     return loadData().then(function () {
       var years = data.postings.map(function (p) { return p.year; }).filter(function (y, i, a) { return a.indexOf(y) === i; }).sort().reverse();
       var thisYear = new Date().getFullYear();
@@ -137,7 +140,7 @@
       var el = page.querySelector("#rSync");
       el.classList.toggle("stale", !s || Date.now() - new Date(s.run_at) > 2 * 3600 * 1000);
       page.querySelector("#rTime").textContent = s ? "마지막 동기화 " + fmtTime(s.run_at) : "동기화 기록 없음";
-      renderAll();
+      renderAll(animate === true);
     }).catch(function (e) {
       page.querySelector("#rTime").textContent = "불러오지 못했습니다: " + (e.message || e);
     });
@@ -148,7 +151,7 @@
   function yearRows() { return data.postings.filter(function (p) { return p.year === state.year && !p.excluded; }); }
   function isOpen(p) { return p.status === "open"; }
 
-  function renderAll() { renderPos(); drawChart(true); renderFilters(); renderTable(); }
+  function renderAll(animate) { renderPos(); drawChart(animate !== false); renderFilters(); renderTable(); }
 
   function renderPos() {
     var rows = yearRows();
@@ -242,8 +245,9 @@
   }
 
   // ── 표 ─────────────────────────────────────────────────────────
-  var COLS = [24, 38, 76, 40, 50, 66, 92, 40, 26, 34, 56, 56, 34, 36, 36, 36, 36, 40, 56, 70, 22, 58];
+  var COLS = [24, 38, 76, 44, 50, 60, 84, 40, 28, 72, 56, 56, 32, 34, 34, 34, 34, 38, 52, 62, 22, 56];
   function histAttr(key, field) {
+    if (field !== "employment" && field !== "note") return "";  // 담당자·인원·중요는 이력 표시 안 함(기록은 DB에 남음)
     var l = data.logs[key + "|" + field];
     return l ? ' class="r-hist" data-hist="' + esc(key + "|" + field) + '"' : "";
   }
@@ -267,7 +271,8 @@
   function row(p, seq, idx) {
     var mm = m(p), open = isOpen(p), emp = mm.employment || p.employment || "";
     var head = '<td class="nw num">' + seq + '</td><td><span class="r-pill ' + (open ? "ing" : "done") + '">' + (open ? "진행" : "완료") + "</span></td>" +
-      '<td><span class="r-badge ' + (CO[p.company] || "none") + '">' + esc(p.company || "표기 없음") + "</span></td><td></td><td></td>" +
+      '<td><span class="r-badge ' + (CO[p.company] || "none") + '">' + esc(p.company || "표기 없음") + "</span></td>" +
+      "<td>" + (open ? "" : esc((p._hires || []).map(function (h) { return h.name; }).join(", "))) + '</td><td class="nw">' + (open ? "" : d8((p._hires || [])[0] && p._hires[0].hire_date)) + "</td>" +
       "<td>" + esc(p.team || "") + '</td><td class="pos">' + esc(p.position) + "</td>";
     if (!open) {
       return '<tr class="done">' + head + "<td>" + esc(emp) + '</td><td class="nw num">' + (mm.headcount || p.pass_count || 1) + "</td><td>" + esc(mm.note || "") +
@@ -279,13 +284,39 @@
       "<td" + histAttr(p.key, "employment") + '><select class="r-cell" data-k="' + k + '" data-f="employment" aria-label="채용형태">' +
         ["정규직", "계약직", "인턴"].concat(emp && ["정규직", "계약직", "인턴"].indexOf(emp) < 0 ? [emp] : []).map(function (x) { return "<option" + (x === emp ? " selected" : "") + ">" + x + "</option>"; }).join("") + "</select></td>" +
       "<td" + histAttr(p.key, "headcount") + '><input class="r-cell" type="number" min="1" value="' + (mm.headcount || 1) + '" data-k="' + k + '" data-f="headcount" aria-label="채용 인원"></td>' +
-      "<td" + histAttr(p.key, "note") + '><select class="r-cell" data-k="' + k + '" data-f="note" aria-label="비고"><option value="">-</option>' +
-        ["증원", "충원"].map(function (x) { return "<option" + (x === mm.note ? " selected" : "") + ">" + x + "</option>"; }).join("") + "</select></td>" +
+      "<td" + histAttr(p.key, "note") + ">" + noteCell(p.key, mm.note) + "</td>" +
       '<td class="nw">' + d8(p.open_date) + '</td><td class="nw"></td>' + stageCells(p) +
       "<td><b>" + esc(p.current_stage || "지원자 없음") + "</b></td><td>" + chCell(p, idx) + "</td>" +
       "<td" + histAttr(p.key, "important") + '><button type="button" class="r-star' + (mm.important ? " on" : "") + '" data-k="' + k + '" aria-label="중요 포지션">★</button></td>' +
       "<td" + histAttr(p.key, "owner") + '><select class="r-cell' + (mm.owner ? "" : " unset") + '" data-k="' + k + '" data-f="owner" aria-label="담당자"><option value="">미지정</option>' +
         OWNERS.map(function (x) { return "<option" + (x === mm.owner ? " selected" : "") + ">" + x + "</option>"; }).join("") + "</select></td></tr>";
+  }
+
+  function noteCell(key, note) {
+    note = note || "";
+    var kind = !note ? "" : note === "증원" ? "증원" : /^충원/.test(note) ? "충원" : "기타";
+    var extra = kind === "충원" ? (note.match(/^충원\((.*)\)$/) || [])[1] || "" : kind === "기타" ? note : "";
+    var k = esc(key);
+    return '<div class="r-note"><select class="r-cell r-note-sel" data-k="' + k + '" aria-label="비고">' +
+      [["", "-"], ["증원", "증원"], ["충원", "충원"], ["기타", "기타"]].map(function (o) { return '<option value="' + o[0] + '"' + (o[0] === kind ? " selected" : "") + ">" + o[1] + "</option>"; }).join("") +
+      "</select>" + (kind === "충원" || kind === "기타" ? '<input class="r-cell r-note-txt" data-k="' + k + '" data-kind="' + kind + '" value="' + esc(extra) + '" placeholder="' + (kind === "충원" ? "퇴사자" : "직접 입력") + '" aria-label="비고 내용">' : "") + "</div>";
+  }
+
+  // 완료 건 ↔ 입사현황(온보딩캘린더) 연결: 같은 회사·팀, 완료일 전후 입사일. 저장하지 않고 화면에서만 맞춤
+  function matchHires() {
+    var used = {};
+    var done = data.postings.filter(function (p) { return p.status === "done" && p.done_date; })
+      .sort(function (a, b) { return a.done_date.localeCompare(b.done_date); });
+    done.forEach(function (p) {
+      var team = (p.team || "").replace(/\s/g, ""), dd = new Date(p.done_date), need = (data.manual[p.key] || {}).headcount || p.pass_count || 1;
+      var cands = data.hires.map(function (h, i) { return { h: h, i: i }; }).filter(function (c) {
+        var dept = (c.h.department || "").replace(/\s/g, "");
+        var gap = (new Date(c.h.hire_date) - dd) / 86400000;
+        return !used[c.i] && c.h.company === p.company && team && dept && (dept === team || dept.indexOf(team) >= 0 || team.indexOf(dept) >= 0) && gap >= -14 && gap <= 120;
+      }).sort(function (a, b) { return Math.abs(new Date(a.h.hire_date) - dd) - Math.abs(new Date(b.h.hire_date) - dd); }).slice(0, need);
+      cands.forEach(function (c) { used[c.i] = true; });
+      p._hires = cands.map(function (c) { return c.h; });
+    });
   }
 
   var shown = [];
@@ -297,7 +328,7 @@
         (state.st === "all" || (state.st === "open") === isOpen(p));
     });
     var byStart = function (a, b) { return (a.open_date || "").localeCompare(b.open_date || ""); };
-    var html = "<colgroup>" + COLS.map(function (w) { return '<col style="width:' + (w / 1022 * 100).toFixed(2) + '%">'; }).join("") + "</colgroup>" +
+    var html = "<colgroup>" + COLS.map(function (w) { return '<col style="width:' + (w / COLS.reduce(function (a, b) { return a + b; }, 0) * 100).toFixed(2) + '%">'; }).join("") + "</colgroup>" +
       "<thead><tr><th>순번</th><th>완료<br>여부</th><th>회사</th><th>성명</th><th>입사일</th><th>팀</th><th>포지션</th><th>채용<br>형태</th><th>인원</th><th>비고</th>" +
       "<th>시작일</th><th>완료일</th><th>모집</th><th>1차<br>면접</th><th>직무<br>과제</th><th>2차<br>면접</th><th>처우<br>협의</th><th>최종<br>합격</th>" +
       "<th>진행<br>단계</th><th>이용채널</th><th>중요</th><th>담당자</th></tr></thead><tbody>";
@@ -323,12 +354,21 @@
     bindTable();
   }
 
-  function save(key, field, value, el) {
+  function save(key, field, value, el, quiet) {
     el && (el.disabled = true);
-    sb.rpc("recruit_update_manual", { p_key: key, p_field: field, p_value: value }).then(function (r) {
+    return sb.rpc("recruit_update_manual", { p_key: key, p_field: field, p_value: value }).then(function (r) {
       if (r.error) { window.alert("저장하지 못했습니다: " + r.error.message); }
-      return refresh();
+      return quiet ? loadData() : refresh(false);
     });
+  }
+  function bindNote(inp) {
+    function commit() {
+      var t = inp.value.trim();
+      var v = inp.dataset.kind === "충원" ? (t ? "충원(" + t + ")" : "충원") : t;
+      save(inp.dataset.k, "note", v, inp);
+    }
+    inp.addEventListener("change", commit);
+    inp.addEventListener("keydown", function (e) { if (e.key === "Enter") inp.blur(); });
   }
 
   function showTip(el, html) {
@@ -342,7 +382,23 @@
 
   function bindTable() {
     var t = page.querySelector("#rTable");
-    t.querySelectorAll(".r-cell").forEach(function (el) {
+    t.querySelectorAll(".r-note-sel").forEach(function (el) {
+      el.addEventListener("change", function () {
+        var v = el.value;
+        if (v === "충원" || v === "기타") {
+          var wrap = el.parentNode, inp = document.createElement("input");
+          inp.className = "r-cell r-note-txt"; inp.dataset.k = el.dataset.k; inp.dataset.kind = v;
+          inp.placeholder = v === "충원" ? "퇴사자" : "직접 입력";
+          var old = wrap.querySelector(".r-note-txt"); if (old) old.remove();
+          wrap.appendChild(inp); bindNote(inp); inp.focus();
+          if (v === "충원") save(el.dataset.k, "note", "충원", null, true);
+          return;
+        }
+        save(el.dataset.k, "note", v, el);
+      });
+    });
+    t.querySelectorAll(".r-note-txt").forEach(bindNote);
+    t.querySelectorAll(".r-cell[data-f]").forEach(function (el) {
       el.addEventListener("change", function () {
         var v = el.value;
         if (el.dataset.f === "headcount" && !(+v >= 1)) { el.value = 1; v = "1"; }

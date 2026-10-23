@@ -103,3 +103,9 @@
 .r-login input { font: inherit; font-size: 14px; padding: 9px 10px; border: 1px solid #D1D5DB; border-radius: 8px; }
 .r-login button { font: inherit; font-weight: 800; font-size: 14px; padding: 10px; border: 0; border-radius: 8px; background: #1F2937; color: #fff; cursor: pointer; }
 .r-login .err { color: #DC2626; font-size: 12.5px; min-height: 1em; }
+
+/* 인원 숫자 가운데(스핀 버튼 숨김), 비고 선택+입력 */
+#recruitPage input.r-cell[type=number] { -moz-appearance: textfield; appearance: textfield; }
+#recruitPage input.r-cell[type=number]::-webkit-inner-spin-button, #recruitPage input.r-cell[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+#recruitPage .r-note { display: flex; flex-direction: column; gap: 2px; }
+#recruitPage .r-note-txt { font-weight: 400; }
