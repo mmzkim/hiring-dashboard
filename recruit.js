@@ -23,14 +23,14 @@
     box.className = "r-login";
     // 확정 시안(채용현황보드 로그인) 그대로. 입력창만 기존 로그인 동작(rId·rPw·rErr)에 연결
     box.innerHTML =
-      '<div class="wrap">' +
-      '<section class="left" aria-label="이용 안내"><div class="copy">' +
-        '<div class="brand"><i><svg viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3.2 3L13 4.8" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></i>채용현황보드</div>' +
+      '<div class="rl-wrap">' +
+      '<section class="rl-left" aria-label="이용 안내"><div class="rl-copy">' +
+        '<div class="rl-brand"><i><svg viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3.2 3L13 4.8" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></i>채용현황보드</div>' +
         '<h1>채용·입사·수습 현황을<br>한 화면에서 확인하세요</h1>' +
-        '<p class="lead">그리팅의 채용 데이터와 온보딩 정보를 자동으로 모아 보여주는 현황판이에요. 평일 낮에는 10분마다 최신 상태로 바뀌어요.</p>' +
-        '<ul class="how"><li><b>온보딩캘린더에 등록된 계정</b>으로만 로그인할 수 있어요.</li><li>계정이 없다면 <b>관리자에게 계정을 요청</b>해 주세요.</li></ul>' +
+        '<p class="rl-lead">그리팅의 채용 데이터와 온보딩 정보를 자동으로 모아 보여주는 현황판이에요. 평일 낮에는 10분마다 최신 상태로 바뀌어요.</p>' +
+        '<ul class="rl-how"><li><b>온보딩캘린더에 등록된 계정</b>으로만 로그인할 수 있어요.</li><li>계정이 없다면 <b>관리자에게 계정을 요청</b>해 주세요.</li></ul>' +
       '</div>' +
-      '<svg class="art" viewBox="0 0 320 260" fill="none" aria-hidden="true">' +
+      '<svg class="rl-art" viewBox="0 0 320 260" fill="none" aria-hidden="true">' +
         '<rect x="150" y="70" width="150" height="170" rx="14" fill="var(--line)"/>' +
         '<rect x="110" y="40" width="150" height="170" rx="14" fill="var(--bg)" stroke="var(--line)" stroke-width="2"/>' +
         '<rect x="130" y="62" width="70" height="10" rx="5" fill="var(--accent)"/>' +
@@ -42,7 +42,7 @@
         '<circle cx="80" cy="170" r="34" fill="var(--accent)"/>' +
         '<path d="M64 170l12 12 22-24" stroke="var(--accent-fg)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>' +
       '</svg></section>' +
-      '<section class="right" aria-label="로그인"><form id="rLoginForm">' +
+      '<section class="rl-right" aria-label="로그인"><form id="rLoginForm">' +
         '<label for="rId">아이디</label><input id="rId" type="text" autocomplete="username" placeholder="온보딩캘린더 아이디" required>' +
         '<label for="rPw">비밀번호</label><input id="rPw" type="password" autocomplete="current-password" placeholder="비밀번호" required>' +
         '<div class="err" id="rErr" role="alert"></div>' +
