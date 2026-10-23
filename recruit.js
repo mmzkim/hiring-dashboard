@@ -352,10 +352,12 @@
         esc(c || "표기 없음") + " · 진행 " + list.length + "건 (시작일 순)</td></tr>";
       list.forEach(function (p) { shown.push(p); html += row(p, ++seq, shown.length - 1); });
     });
-    var done = rows.filter(function (p) { return !isOpen(p); }).sort(function (a, b) { return (b.done_date || "").localeCompare(a.done_date || ""); });
+    // 완료: 입사일이 이른 순(입사일 없으면 완료일, 그래도 없으면 맨 뒤)
+    var hd = function (p) { return p.hire_date || ((p._hires || [])[0] && p._hires[0].hire_date) || p.done_date || "9999"; };
+    var done = rows.filter(function (p) { return !isOpen(p); }).sort(function (a, b) { return hd(a).localeCompare(hd(b)); });
     nDone = done.length;
     if (done.length) {
-      html += '<tr class="group fin"><td colspan="22"><span class="sq" style="background:#9CA3AF"></span>완료 · ' + done.length + "건 (완료일 최근순)</td></tr>";
+      html += '<tr class="group fin"><td colspan="22"><span class="sq" style="background:#9CA3AF"></span>완료 · ' + done.length + "건 (입사일 순)</td></tr>";
       ["GC케어", "GC메디아이", null].forEach(function (c) {
         var list = done.filter(function (p) { return (p.company || null) === c; });
         if (!list.length) return;
