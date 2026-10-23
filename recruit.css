@@ -117,3 +117,6 @@
 #recruitPage table.r-data tr.group.sub td { background: #F3F4F6; font-size: 12px; font-weight: 700; padding: 3px 10px 3px 24px; color: #4B5563; }
 #recruitPage table.r-data tr.group.sub.care td::before { content: "● "; color: var(--r-care); }
 #recruitPage table.r-data tr.group.sub.medi td::before { content: "● "; color: var(--r-medi); }
+
+#recruitPage .r-note-view { cursor: pointer; border-bottom: 1px dashed var(--r-line-strong); }
+#recruitPage .r-note-view:hover { color: var(--r-ink); }

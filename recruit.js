@@ -304,6 +304,11 @@
 
   function noteCell(key, note) {
     note = note || "";
+    if (note) return '<span class="r-note-view" tabindex="0" role="button" title="클릭해서 수정" data-k="' + esc(key) + '" data-note="' + esc(note) + '">' + esc(note) + "</span>";
+    return noteEditor(key, note);
+  }
+  function noteEditor(key, note) {
+    note = note || "";
     var kind = !note ? "" : note === "증원" ? "증원" : /^충원/.test(note) ? "충원" : "기타";
     var extra = kind === "충원" ? (note.match(/^충원\((.*)\)$/) || [])[1] || "" : kind === "기타" ? note : "";
     var k = esc(key);
@@ -399,7 +404,20 @@
 
   function bindTable() {
     var t = page.querySelector("#rTable");
-    t.querySelectorAll(".r-note-sel").forEach(function (el) {
+    t.querySelectorAll(".r-note-view").forEach(function (v) {
+      function edit() {
+        var td = v.parentNode;
+        td.innerHTML = noteEditor(v.dataset.k, v.dataset.note);
+        td.querySelectorAll(".r-note-sel").forEach(bindNoteSel);
+        td.querySelectorAll(".r-note-txt").forEach(bindNote);
+        var f = td.querySelector(".r-note-txt") || td.querySelector(".r-note-sel");
+        if (f) f.focus();
+      }
+      v.addEventListener("click", edit);
+      v.addEventListener("keydown", function (e) { if (e.key === "Enter") edit(); });
+    });
+    t.querySelectorAll(".r-note-sel").forEach(bindNoteSel);
+    function bindNoteSel(el) {
       el.addEventListener("change", function () {
         var v = el.value;
         if (v === "충원" || v === "기타") {
@@ -413,7 +431,7 @@
         }
         save(el.dataset.k, "note", v, el);
       });
-    });
+    }
     t.querySelectorAll(".r-note-txt").forEach(bindNote);
     t.querySelectorAll(".r-cell[data-f]").forEach(function (el) {
       el.addEventListener("change", function () {
