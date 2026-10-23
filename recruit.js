@@ -21,10 +21,30 @@
   function showLogin() {
     var box = document.createElement("div");
     box.className = "r-login";
-    box.innerHTML = '<form id="rLoginForm"><h2>HR Board 로그인</h2><p>온보딩캘린더 아이디와 비밀번호로 로그인하세요. 한 번 로그인하면 이 브라우저에서 계속 유지됩니다.</p>' +
-      '<label for="rId">아이디<input id="rId" autocomplete="username" required></label>' +
-      '<label for="rPw">비밀번호<input id="rPw" type="password" autocomplete="current-password" required></label>' +
-      '<div class="err" id="rErr"></div><button type="submit">로그인</button></form>';
+    box.innerHTML =
+      '<section class="r-login-info">' +
+        '<div class="r-login-brand"><b>HR Board</b><span>GC케어 · GC메디아이 채용·온보딩 현황</span></div>' +
+        '<h2>채용부터 입사·수습까지<br>한 화면에서 확인하세요</h2>' +
+        '<div class="r-login-block"><h3>로그인 방법</h3><ul>' +
+          '<li>온보딩캘린더에 등록된 계정(아이디·비밀번호)으로만 로그인할 수 있어요.</li>' +
+          '<li>계정이 없으면 관리자(인사팀 김무준)에게 계정을 요청하세요.</li></ul></div>' +
+        '<div class="r-login-block"><h3>이렇게 돌아가요</h3><ul>' +
+          '<li><b>채용현황</b> · 그리팅 공고·전형 정보를 평일 10분마다 자동으로 모아요.</li>' +
+          '<li><b>입사·수습현황</b> · 온보딩캘린더에 등록된 입사자 정보로 보여줘요.</li>' +
+          '<li>로그인한 사람만 볼 수 있고, 담당자·인원·비고는 화면에서 바로 고칠 수 있어요.</li></ul></div>' +
+        '<svg class="r-login-art" viewBox="0 0 260 200" aria-hidden="true">' +
+          '<rect x="20" y="120" width="34" height="60" rx="6" fill="#16A34A" opacity=".9"/>' +
+          '<rect x="64" y="90" width="34" height="90" rx="6" fill="#EA580C" opacity=".9"/>' +
+          '<rect x="108" y="60" width="34" height="120" rx="6" fill="#16A34A" opacity=".75"/>' +
+          '<rect x="152" y="30" width="34" height="150" rx="6" fill="#EA580C" opacity=".75"/>' +
+          '<polyline points="37,110 81,80 125,52 169,22 230,10" fill="none" stroke="#1F2937" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="6 6"/>' +
+          '<circle cx="230" cy="10" r="7" fill="#1F2937"/>' +
+        '</svg>' +
+      '</section>' +
+      '<section class="r-login-form"><form id="rLoginForm"><h2>로그인</h2>' +
+        '<label for="rId">아이디<input id="rId" autocomplete="username" required></label>' +
+        '<label for="rPw">비밀번호<input id="rPw" type="password" autocomplete="current-password" required></label>' +
+        '<div class="err" id="rErr"></div><button type="submit">로그인</button></form></section>';
     document.body.appendChild(box);
     box.querySelector("form").addEventListener("submit", function (e) {
       e.preventDefault();
