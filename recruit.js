@@ -247,7 +247,7 @@
   // ── 표 ─────────────────────────────────────────────────────────
   var COLS = [24, 38, 76, 44, 50, 60, 84, 40, 28, 72, 56, 56, 32, 34, 34, 34, 34, 38, 52, 62, 22, 56];
   function histAttr(key, field) {
-    if (field !== "employment" && field !== "note") return "";  // 담당자·인원·중요는 이력 표시 안 함(기록은 DB에 남음)
+    return "";  // 수정 이력은 화면에 표시하지 않음(기록은 DB에만 남음)
     var l = data.logs[key + "|" + field];
     return l ? ' class="r-hist" data-hist="' + esc(key + "|" + field) + '"' : "";
   }
@@ -272,7 +272,7 @@
     var mm = m(p), open = isOpen(p), emp = mm.employment || p.employment || "";
     var head = '<td class="nw num">' + seq + '</td><td><span class="r-pill ' + (open ? "ing" : "done") + '">' + (open ? "진행" : "완료") + "</span></td>" +
       '<td><span class="r-badge ' + (CO[p.company] || "none") + '">' + esc(p.company || "표기 없음") + "</span></td>" +
-      "<td>" + (open ? "" : esc((p._hires || []).map(function (h) { return h.name; }).join(", "))) + '</td><td class="nw">' + (open ? "" : d8((p._hires || [])[0] && p._hires[0].hire_date)) + "</td>" +
+      "<td>" + (open ? "" : esc(p.hire_names || (p._hires || []).map(function (h) { return h.name; }).join(", "))) + '</td><td class="nw">' + (open ? "" : d8(p.hire_date || ((p._hires || [])[0] && p._hires[0].hire_date))) + "</td>" +
       "<td>" + esc(p.team || "") + '</td><td class="pos">' + esc(p.position) + "</td>";
     if (!open) {
       return '<tr class="done">' + head + "<td>" + esc(emp) + '</td><td class="nw num">' + (mm.headcount || p.pass_count || 1) + "</td><td>" + esc(mm.note || "") +
@@ -305,7 +305,7 @@
   // 완료 건 ↔ 입사현황(온보딩캘린더) 연결: 같은 회사·팀, 완료일 전후 입사일. 저장하지 않고 화면에서만 맞춤
   function matchHires() {
     var used = {};
-    var done = data.postings.filter(function (p) { return p.status === "done" && p.done_date; })
+    var done = data.postings.filter(function (p) { return p.status === "done" && p.done_date && !p.hire_names; })
       .sort(function (a, b) { return a.done_date.localeCompare(b.done_date); });
     done.forEach(function (p) {
       var team = (p.team || "").replace(/\s/g, ""), dd = new Date(p.done_date), need = (data.manual[p.key] || {}).headcount || p.pass_count || 1;
